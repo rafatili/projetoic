@@ -1,5 +1,10 @@
 # projetoic
-Simulador de implante coclear
+## Simulador de implante coclear
 
-* Parte 1 -- processamento do sinal
-* Parte 2 -- modelo psicoacústico
+1. Processamento do sinal
+  1. Sinal
+  * Banco de filtros
+
+* Modelo psicoacústico
+
+[Aqui](https://github.com/rafatili/projetoic.git) você acessa a página do projeto no Github.
