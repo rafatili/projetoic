@@ -11,6 +11,6 @@
 1. Modelo psicoacústico
   1. Espalhamento de Corrente
   1. Loudness
-  1. Sintetização de áudio
+  1. Sintetizador de áudio
 
 [Aqui](https://github.com/rafatili/projetoic.git) você acessa a página do projeto no Github.
