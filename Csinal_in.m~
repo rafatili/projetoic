@@ -1,0 +1,15 @@
+classdef Csinal_in
+    %Csinal_in Summary of this class goes here
+    %   Detailed explanation goes here
+    
+    properties
+        Tfile;      %arquivo de audio alvo
+        Nfile;      %arquivo de audio de ruido
+        Tang_hor;   %angulo        
+    end
+    
+    methods
+    end
+    
+end
+
