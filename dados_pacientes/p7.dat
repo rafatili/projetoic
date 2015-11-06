@@ -1,0 +1,37 @@
+Empresa	Cochlear									
+Strategy	ACE									
+Frequency_Table	17									
+Maxima	8									
+Inter-Phase_Gap	45									
+Jitter	0									
+Tone_Channels	7	14								
+Loudness_Growth	20									
+T-SPL	25									
+C-SPL	65									
+Using_Manual_Power_Setting	1									
+Power_Setting	48									
+										
+										
+Channel_Number	Active_Eletrode	Stimulation_Mode	Threshold	Comfort	Dynamic_Range	Objective_Measure	Pulse_Width	Gain	Lower_Freq	Upper_Freq
+22										
+21										
+20										
+19										
+18	18	22	67	108	41	0	0	0	188	313
+17	17	21	66	119	53	0	0	0	313	438
+16	16	20	65	121	56	0	0	0	438	563
+15	15	19	66	119	53	0	0	0	563	813
+14	14	18	59	114	55	0	0	0	813	1063
+13	13	17	54	112	58	0	0	0	1063	1313
+12	12	16	51	108	57	0	0	0	1313	1563
+11	11	15	56	106	50	0	0	0	1563	1813
+10	10	14	46	101	55	0	0	0	1813	2188
+9	9	13	40	95	55	0	0	0	2188	2563
+8	8	12	55	97	42	0	0	0	2563	3063
+7	7	11	60	96	36	0	0	0	3063	3563
+6	6	10	57	102	45	0	0	0	3563	4188
+5	5	9	62	102	40	0	0	0	4188	4938
+4	4	8	52	120	68	0	0	0	4938	5813
+3	3	7	48	81	33	0	0	0	5813	6813
+2										
+1	1	5	30	53	23	0	0	0	6813	7938
