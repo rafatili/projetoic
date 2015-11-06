@@ -1,0 +1,35 @@
+Frequency_Table	13									
+Maxima	8									
+Inter-Phase_Gap	8									
+Jitter	0									
+Tone_Channels	7	14								
+Loudness_Growth	20									
+T-SPL	25									
+C-SPL	65									
+Using_Manual_Power_Setting	0									
+Power_Setting	66									
+										
+										
+Channel_Number	Active_Eletrode	Stimulation_Mode	Threshold	Comfort	Dynamic_Range	Objective_Measure	Pulse_Width	Gain	Lower_Freq	Upper_Freq
+22										
+21										
+20										
+19										
+18										
+17										
+16										
+15										
+14	14	1	125	177	52	0	25	0	188	313
+13	13	1	125	177	52	0	25	0	313	563
+12	12	1	125	177	52	0	25	0	563	813
+11	11	1	125	177	52	0	25	0	813	1063
+10	10	1	125	177	52	0	25	0	1063	1313
+9	9	1	125	177	52	0	25	0	1313	1688
+8	8	1	125	177	52	0	25	0	1688	2063
+7	7	1	125	177	52	0	25	0	2063	2563
+6	6	1	125	177	52	0	25	0	2563	3188
+5										
+4	4	1	125	177	52	0	25	0	3188	4063
+3	3	1	125	177	52	0	25	0	4063	5063
+2	2		125	177	52	0	25	0	5063	6313
+1	1	1	125	177	52	0	25	0	6313	7938
