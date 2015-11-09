@@ -13,4 +13,4 @@
   1. Loudness
   1. Sintetizador de áudio
 
-[Aqui](https://github.com/rafatili/projetoic/wiki/ProjetoIC) você acessa a wiki do projeto, com informações sobre como usar o *git*.
+[Aqui](https://github.com/rafatili/projetoic/wiki/ProjetoIC) você acessa a wiki do projeto, com informações sobre como contribuir usando o *git*.
