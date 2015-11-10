@@ -1,4 +1,4 @@
-function [fcoefs, bandwidths] = MakeCIFilters(fs,numChannels,lowFreq)
+function [fcoefs, bandwidths] = MakeCIFilters(fs,numChannels,lowFreq,bandwidths_in)
 % function [fcoefs]=MakeCIFilters(fs,numChannels,lowFreq)
 % This function is based on MakeERBFilters from the Auditory Toolbox, but
 % computes the filter coefficients for a bank of filters emulating the 
@@ -28,7 +28,9 @@ minBW = 24.7;
 order = 1;
 
 % Bandwidths for emulating a Nucleus device
-bandwidths = [1000;875;750;625;625;500;500;375;375;250;250;250;250;125;125;125;125;125;125;125;125;125];
+
+bandwidths = bandwidths_in;
+%bandwidths = [1000;875;750;625;625;500;500;375;375;250;250;250;250;125;125;125;125;125;125;125;125;125];
 
 B=1.019*2*pi*bandwidths;
 
