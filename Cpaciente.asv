@@ -1,4 +1,4 @@
-classdef Cpaciente < handle
+classdef Cpaciente
     % Classe para extração das informações e dados de pacientes
     
     properties
@@ -7,10 +7,12 @@ classdef Cpaciente < handle
         excluir = [7 8] % Exclusao de alguns pacientes
         modelo_arquivo_cochlear = './dados_pacientes/p_cochlear_' % Modelo do arquivo de dados para pacientes da cochlear       
         paciente_cochlear_media_matriz
-        paciente_cochlear_media_vetor         
+        paciente_cochlear_media_vetor  
+        
     end
     
-    properties (Dependent)            
+    properties (Dependent)       
+       
         empresa
         estrategia
         numero_canais
@@ -39,15 +41,15 @@ classdef Cpaciente < handle
             end            
         end
 %% GET       
-        function paciente_cochlear_media_matriz = get.paciente_cochlear_media_matriz(objeto)    
-            [A, ~] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
-            paciente_cochlear_media_matriz = A;
-        end     
-
-        function paciente_cochlear_media_vetor = get.paciente_cochlear_media_vetor (objeto)    
-            [~, B] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
-            paciente_cochlear_media_vetor  = B;
-        end 
+%         function paciente_cochlear_media_matriz = get.paciente_cochlear_media_matriz(objeto)    
+%             [A, ~] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
+%             paciente_cochlear_media_matriz = A;
+%         end     
+% 
+%         function paciente_cochlear_media_vetor = get.paciente_cochlear_media_vetor (objeto)    
+%             [~, B] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
+%             paciente_cochlear_media_vetor  = B;
+%         end 
         
         function empresa = get.empresa(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
@@ -163,13 +165,14 @@ classdef Cpaciente < handle
         
 %% BLOCOS
 
-%         function media_paciente(objeto)
-%             if strcmp(objeto.empresa,'Cochlear')
-%             [objeto.paciente_cochlear_media_matriz, ~] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
-%             else
-%                 error('Dados de pacientes de outras empresas ainda não foram adicionados')
-%             end
-%         end
+        function media_paciente(objeto)
+            if strcmp(empresa,'Cochlear')
+            [objeto.paciente_cochlear_media_matriz, objeto.paciente_cochlear_media_vetor] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
+            [~, objeto.paciente_cochlear_media_vetor] = media_paciente_cochlear(objeto.quantidade,objeto.modelo_arquivo_cochlear,objeto.excluir);
+            else
+                error('Dados de pacientes de outras empresas ainda não foram adicionados')
+            end
+        end
     end       
 end
 
