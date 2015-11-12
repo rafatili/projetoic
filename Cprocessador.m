@@ -41,15 +41,16 @@ classdef Cprocessador < handle
             elseif nargin == 2
                 objeto.nome = prop1;
                 objeto.paciente = prop2;
-            end
             
-            if strcmp(objeto.paciente,'media') == 0
-               
+%                 if strcmp(objeto.paciente,'media') == 1
+%                     Cpaciente(objeto.paciente).media_paciente()
+%                 end
+                
             objeto.num_canais = max(Cpaciente(objeto.paciente).numero_canais);
             %objeto.maxima = Cpaciente(objeto.paciente).maxima;
             objeto.interphase_gap = mean(Cpaciente(objeto.paciente).inter_phase_gap)*1e-6;
             objeto.largura_pulso = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
-            objeto.fat_comp = mean(Cpaciente(objeto.paciente).loudness_exp);
+            objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
             objeto.amp_corr_T = Cpaciente(objeto.paciente).T_corr;
             objeto.amp_corr_C = Cpaciente(objeto.paciente).C_corr;
             objeto.low_freq = Cpaciente(objeto.paciente).lower_freq(1,1);
@@ -106,12 +107,12 @@ classdef Cprocessador < handle
         end
         
         function comp(objeto)
-            objeto.Csinal_processador.comp = comp(objeto.Csinal_processador.env,objeto.fat_comp,objeto.quant_bits,objeto.amp_corr_C,objeto.amp_corr_T,objeto.max_corr);         
+            objeto.Csinal_processador.comp = comp(objeto.Csinal_processador.env,objeto.fat_comp,objeto.quant_bits,objeto.amp_corr_C,objeto.amp_corr_T);         
         end
        
         function ger_pulsos(objeto)          
             objeto.Csinal_processador.corr_onda = ger_pulsos(objeto.Csinal_processador.comp,objeto.num_canais,...
-                objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso);                   
+                objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso,objeto.max_corr,objeto.quant_bits);                   
         end
                                                   
         function cis(objeto)

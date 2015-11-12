@@ -1,4 +1,4 @@
-function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_est,tipo_pulso,largura_pulso,interphase_gap,fase_pulso,atraso,max_corr,quant_bits)
+function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_est,tipo_pulso,largura_pulso,interphase_gap,fase_pulso,atraso)
 
     if num_canais == maxima % Estrategia CIS            
             

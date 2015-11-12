@@ -6,16 +6,14 @@ clc
 addpath(genpath('./funcoes'))
 addpath(genpath('./SRMRToolbox-master'))
 
-%p = Cpaciente('./dados_pacientes/p_cochlear_1.dat');
-%p = Cpaciente('media',10,[7 8]);
-sim = Cprocessador('sinal16k.wav', './dados_pacientes/p_cochlear_1.dat');
-%sim = Cprocessador('sinal16k.wav',);
+%sim = Cprocessador('sinal16k.wav', './dados_pacientes/p_cochlear_9.dat');
+sim = Cprocessador('sinal16k.wav', 'media');
 sim.num_canais = 22;
 sim.maxima = 22;
 sim.taxa_est = 700;
 sim.fcorte_fpb = 400;
 sim.ordem_fpb = 4;
-sim.fat_comp = 0.4;
+%sim.fat_comp = 0.6;
 
 tic
 sim.cis();
@@ -26,7 +24,7 @@ sim.Csinal_processador
 
 n = 8;
 
-figure(1)
+figure(2)
 subplot(4,1,1)
 plot(sim.vet_tempo,sim.Csinal_processador.filt(n,:))
 subplot(4,1,2)
