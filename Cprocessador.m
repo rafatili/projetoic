@@ -47,7 +47,7 @@ classdef Cprocessador < handle
 %                 end
                 
             objeto.num_canais = max(Cpaciente(objeto.paciente).numero_canais);
-            %objeto.maxima = Cpaciente(objeto.paciente).maxima;
+            objeto.maxima = Cpaciente(objeto.paciente).maxima;
             objeto.interphase_gap = mean(Cpaciente(objeto.paciente).inter_phase_gap)*1e-6;
             objeto.largura_pulso = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
             objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
