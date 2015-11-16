@@ -70,9 +70,9 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                        
                     for i = 1:maxima                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
+                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
                                 t = t + largura_pulso + interphase_gap;
-                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
+                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
                                 t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
                                 a(maxima_vet2(i)) = a(maxima_vet2(i)) + 2;
                         end                     

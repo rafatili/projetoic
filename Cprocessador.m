@@ -115,7 +115,7 @@ classdef Cprocessador < handle
                 objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso,objeto.max_corr,objeto.quant_bits);                   
         end
                                                   
-        function cis(objeto)
+        function cis_ace(objeto)
             openwav(objeto)
             filtros(objeto)
             ext_env(objeto)
