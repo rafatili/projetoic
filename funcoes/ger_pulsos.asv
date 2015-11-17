@@ -29,9 +29,9 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                     n = 0;                         
                     for i = num_canais:-1:1                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida(i,a,:) = [t , fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)]; 
+                                saida.(strcat('E',num2str(i)))(a,:) = [t , fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)]; 
                                 t = t + largura_pulso + interphase_gap;
-                                saida(i,a + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)];                                
+                                saida.(strcat('E',num2str(i)))(a + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)];                                
                                 t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
                         end                       
                         if atraso == 0
@@ -66,20 +66,19 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                        [maxima1, maxima2] = sort(maxima_vet,'descend');
                        maxima_valor = maxima1(1:maxima);
                        maxima_canal = maxima2(1:maxima);
+                       [maxima_vet2, maxima_vet3] = sort(maxima_canal,'descend');
                        
-                    for i = maxima:-1:1                        
+                    for i = 1:maxima                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida(maxima_canal(i),a(maxima_canal(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(i)]; 
+                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
                                 t = t + largura_pulso + interphase_gap;
-                                saida(maxima_canal(i),a(maxima_canal(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(i)];                                
+                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
                                 t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
-                                a(maxima_canal(i)) = a(maxima_canal(i)) + 2;
+                                a(maxima_vet2(i)) = a(maxima_vet2(i)) + 2;
                         end                     
                     end
-                    
-                end
-          
-%           error('Estrategia ACE ainda nao programada!') % Estrategia ACE
-%           stop
+%                     display('Numero de pulsos por canal ACE')
+%                     a
+                end          
      end
 end

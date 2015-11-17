@@ -29,7 +29,7 @@ order = 1;
 
 % Bandwidths for emulating a Nucleus device
 
-bandwidths = bandwidths_in;
+bandwidths = fliplr(bandwidths_in);
 %bandwidths = [1000;875;750;625;625;500;500;375;375;250;250;250;250;125;125;125;125;125;125;125;125;125];
 
 B=1.019*2*pi*bandwidths;

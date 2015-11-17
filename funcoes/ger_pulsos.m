@@ -66,18 +66,19 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                        [maxima1, maxima2] = sort(maxima_vet,'descend');
                        maxima_valor = maxima1(1:maxima);
                        maxima_canal = maxima2(1:maxima);
+                       [maxima_vet2, maxima_vet3] = sort(maxima_canal,'descend');
                        
-                    for i = maxima:-1:1                        
+                    for i = 1:maxima                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_canal(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(i)]; 
+                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
                                 t = t + largura_pulso + interphase_gap;
-                                saida.(strcat('E',num2str(maxima_canal(i))))(a(maxima_canal(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(i)];                                
+                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
                                 t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
-                                a(maxima_canal(i)) = a(maxima_canal(i)) + 2;
+                                a(maxima_vet2(i)) = a(maxima_vet2(i)) + 2;
                         end                     
                     end
-                    display('Numero de pulsos por canal ACE')
-                    a
+%                     display('Numero de pulsos por canal ACE')
+%                     a
                 end          
      end
 end
