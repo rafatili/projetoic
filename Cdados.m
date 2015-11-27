@@ -83,8 +83,7 @@ classdef Cdados
                 vn = strcat('E',num2str(n));
                 tc = obj.Pulsos.(vn);
                 ondas(n,:)=calcOndas(tc, f2, obj.tipo_pulso, ...
-                    obj.largura_pulso, tempo);
-                
+                    obj.largura_pulso, tempo);                
             end
         end
     end
