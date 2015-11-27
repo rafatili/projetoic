@@ -79,11 +79,11 @@ classdef Cdados
             tempo=(1:npoints)*1/obj.freq2;
             ondas=zeros(obj.num_canais,npoints);
 
-            for n = 10:obj.num_canais
+            for n = 1:obj.num_canais
                 vn = strcat('E',num2str(n));
                 tc = obj.Pulsos.(vn);
                 ondas(n,:)=calcOndas(tc, f2, obj.tipo_pulso, ...
-                    obj.largura_pulso, obj.interphase_gap, tempo);
+                    obj.largura_pulso, tempo);
                 
             end
         end

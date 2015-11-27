@@ -1,4 +1,4 @@
-function onda = calcOndas( pulsos, freq2, tipo, largura, interfase, tempo)
+function onda = calcOndas( pulsos, freq2, tipo, largura, tempo)
 %calcOndas retorna as ondas de corrente amostradas com frequência freq2
 %onda = calcOndas( pulsos, freq2, tipo, largura, interfase, L)
 %   onda: saida em amperes
@@ -13,13 +13,10 @@ switch(tipo)
     case 'Bifasico'
         %% para pulsos bifásicos
         Lpos=floor(largura*freq2);
-        Lneg=Lpos;
-        Lgap=floor(interfase*freq2);
-        Lt=Lpos+Lneg+Lgap;
+        Lt=Lpos;
 
         %% gera pulso básico
-        Pbase=[ones(1,Lpos), zeros(1,Lgap), -1*ones(1,Lneg)];
-        plot(Pbase,'*')
+        Pbase=ones(1,Lpos);
         
         %% gera as ondas
         [Ltime, ~] = size(pulsos);
