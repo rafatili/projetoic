@@ -1,4 +1,4 @@
-%% Simulação do sinal no implante coclear
+%% Simulaï¿½ï¿½o do sinal no implante coclear
 
 clear classes
 clear all
@@ -19,8 +19,8 @@ tic
 sim.cis_ace();
 toc
 
-sim
-sim.Csinal_processador
+display(sim);
+display(sim.Csinal_processador)
 
 %% Etapas dos sinais
 
