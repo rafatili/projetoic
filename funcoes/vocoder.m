@@ -13,10 +13,10 @@ function saida = vocoder(entrada,freq_amost,tipo_vocoder,bandwidths_in,upper_fre
            center_freq = (upper_freq(i) + lower_freq(i))/2;
            Bandas(i,:) = sin(2*pi*center_freq.*vet_tempo)';
        end
-        
+       Bandas = flipud(Bandas);
     else
         disp('Processo cancelado.');
-        error('Erro: Tipo de sintese invalido. Opções disponiveis: Ruido, Senoidal ')
+        error('Erro: Tipo de sintese invalido. Opcoes disponiveis: Ruido, Senoidal ')
     end
         
        Audio_bandas = Bandas.*entrada;     
