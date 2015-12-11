@@ -1,0 +1,18 @@
+function saida = vocoder(entrada1,tipo_vocoder,num_canais,upper_freq,lower_freq)
+    if strcmp(tipo_vocoder,'Ruido') == 1
+       
+       Ruido = randn(size(entrada,2),1);  % gera ruido branco
+       Ruido = Ruido - median(Ruido); % força que a media seja = 0
+       Ruido = Ruido/max(abs(Ruido)); % normaliza entre -1 e 1       
+
+       Bandas_Ruido = CIFilterBank(freq_amost, size(entrada,1), low_freq, Ruido,Cpaciente(objeto.paciente).bandwidths_in);
+
+       
+    elseif strcmp(tipo_vocoder,'Senoidal') == 1
+        
+    else
+        disp('Processo cancelado.');
+        error('Erro: Tipo de sintese invalido. Opções disponiveis: Ruido, Senoidal ')
+    end
+
+end

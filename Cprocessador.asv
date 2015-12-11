@@ -7,8 +7,8 @@ classdef Cprocessador < handle
         num_canais = 22 % Numero de canais do IC
         maxima = 22 % Selecao de n (maxima) canais por frame
         tipo_filtro = 'Butterworth' % Tipo de filtro para o banco do IC
-        tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
-        fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
+        tipo_env = 'Hilbert' % Tipo de extração da envoltoria
+        fcorte_fpb = 400; % Frequência de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         largura_pulso = 25e-6 % Largura do pulso (meia onda sem contar o interphase gap)
@@ -30,13 +30,13 @@ classdef Cprocessador < handle
     properties (Dependent)
         dt % Intervalo de tempo entre pontos no arquivo de entrada
         T_total % Tempo total do arquivo de entrada
-        freq_amost % Frequencia de amostragem do arquivo de entrada
+        freq_amost % Frequência de amostragem do arquivo de entrada
         num_bits % Número de bits do arquivo de entrada 
         vet_tempo % Vetor temporal do arquivo de entrada
     end
     
-    methods % Funcoes da Classe
-        function objeto = Cprocessador(prop1,prop2) % Funcao geral da Classe
+    methods % Funções da Classe
+        function objeto = Cprocessador(prop1,prop2) % Função geral da Classe
             if nargin == 1
                 objeto.nome = prop1;
             elseif nargin == 2
@@ -124,12 +124,8 @@ classdef Cprocessador < handle
             ger_pulsos(objeto)
         end
         
-        function saida = vocoder(objeto,flag)
+        function saida = vocoder(objeto)
             saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,objeto.tipo_vocoder,Cpaciente(objeto.paciente).bandwidths_in,Cpaciente(objeto.paciente).upper_freq,Cpaciente(objeto.paciente).lower_freq,objeto.vet_tempo);
-            if flag == 1
-            nv = 'vocoder_';
-            audiowrite(strcat(nv,objeto.tipo_vocoder,'_',objeto.nome),saida,objeto.freq_amost)
-            end
         end
 
     end

@@ -24,7 +24,6 @@ classdef Cpaciente < handle
         C_corr
         lower_freq
         upper_freq
-        center_freq
         bandwidths_in
     end
     
@@ -102,10 +101,6 @@ classdef Cpaciente < handle
             bandwidths_in = objeto.upper_freq - objeto.lower_freq;
         end
         
-        function center_freq = get.center_freq(objeto)
-            center_freq = (objeto.upper_freq + objeto.lower_freq)./2;
-        end
-        
         function largura_pulso = get.largura_pulso(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
             largura_pulso = mean(objeto.paciente_cochlear_media_matriz(:,7));
@@ -136,7 +131,7 @@ classdef Cpaciente < handle
             else
             a = dlmread(objeto.arquivo_dat,'\t',[7 1 7 1]);           
             end
-
+            a
             if a == 20
             fat_comp = 0.24;
             elseif a == 30
