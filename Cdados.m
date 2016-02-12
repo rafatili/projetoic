@@ -24,6 +24,7 @@ classdef Cdados
         baixa_freq;       % Frequencia central do filtro de baixa frequencia
         nome;           % Nome do arquivo de entrada de audio
         famost;
+        NF = 1;       % Discretização da nova freq amost
 
     end
     properties(Dependent)
@@ -62,7 +63,7 @@ classdef Cdados
         end
         
         function f2=get.freq2(obj)
-            f2=20*obj.famost;
+            f2=3*obj.famost;
         end
         
         function [ondas, tempo] = calcOndas(obj)
