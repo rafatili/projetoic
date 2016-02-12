@@ -21,7 +21,7 @@ classdef Cdados
         max_corr;       % Maxima corrente do gerador
         atraso;         % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente;       % Utilizacao das informacoes do 'paciente padrao' da clase
-        low_freq;       % Frequencia central do filtro de baixa frequencia
+        baixa_freq;       % Frequencia central do filtro de baixa frequencia
         nome;           % Nome do arquivo de entrada de audio
         famost;
 
@@ -55,7 +55,7 @@ classdef Cdados
             obj.max_corr = Y.max_corr;
             obj.atraso = Y.atraso;
             obj.paciente = Y.paciente;
-            obj.low_freq = Y.low_freq;
+            obj.baixa_freq = Y.baixa_freq;
             obj.nome = Y.nome;
             obj.famost = Y.freq_amost;
             

@@ -9,7 +9,7 @@ addpath(genpath('./SRMRToolbox-master'))
 %sim = Cprocessador('sinal16k.wav', './dados_pacientes/p_cochlear_padrao.dat');
 sim = Cprocessador('sinal16k.wav', 'media');
 sim.num_canais = 22;
-sim.maxima = 22;
+sim.maxima = 10;
 sim.taxa_est = 700;
 sim.tipo_env = 'Hilbert';
 %sim.tipo_env = 'Retificacao';

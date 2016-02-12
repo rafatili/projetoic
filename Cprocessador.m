@@ -17,12 +17,12 @@ classdef Cprocessador < handle
         quant_bits = 8 % Número de bits para divisão da faixa dinamica
         fat_comp = 0.6 % fator de compressao (expoente para a lei da potencia)
         fase_pulso = 'Catodico' % Fase inicial do pulso: Anodico (-) ou Catodico (+)
-        amp_corr_T = 1e-5 % Limiar da amplitude de corrente
-        amp_corr_C = 1e-3 % Maximo conforto para amplitude de corrente
+        amp_corr_T  % Limiar da amplitude de corrente por banda
+        amp_corr_C % Maximo conforto para amplitude de corrente por banda
         max_corr = 1.75e-3 % Maxima corrente do gerador
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
-        low_freq = 150 % Frequencia central do filtro de baixa frequencia
+        baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome % Nome do arquivo de entrada de audio
         tipo_vocoder = 'Senoidal' % Formato de onda para reconstrucao com vocoder: 'Ruido' / 'Senoidal'
     end
@@ -47,15 +47,14 @@ classdef Cprocessador < handle
 %                     Cpaciente(objeto.paciente).media_paciente()
 %                 end
                 
-            objeto.num_canais = max(Cpaciente(objeto.paciente).numero_canais);
+            objeto.num_canais = max(Cpaciente(objeto.paciente).num_canais);
             objeto.maxima = Cpaciente(objeto.paciente).maxima;
-            objeto.interphase_gap = mean(Cpaciente(objeto.paciente).inter_phase_gap)*1e-6;
+            objeto.interphase_gap = mean(Cpaciente(objeto.paciente).interphase_gap)*1e-6;
             objeto.largura_pulso = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
             objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
-            objeto.amp_corr_T = Cpaciente(objeto.paciente).T_corr;
-            objeto.amp_corr_C = Cpaciente(objeto.paciente).C_corr;
-            objeto.low_freq = Cpaciente(objeto.paciente).lower_freq(1,1);
-            %objeto.num_canais = Cpaciente(objeto.paciente).upper_freq;
+            objeto.amp_corr_T = Cpaciente(objeto.paciente).amp_corr_T;
+            objeto.amp_corr_C = Cpaciente(objeto.paciente).amp_corr_C;
+            objeto.baixa_freq = Cpaciente(objeto.paciente).inf_freq(1,1);
                                               
             end
         end 
@@ -99,8 +98,8 @@ classdef Cprocessador < handle
 %% BLOCOS
 
         function filtros(objeto)
-            %objeto.Csinal_processador.filt = cochlearFilterBank(objeto.freq_amost, objeto.num_canais, objeto.low_freq, objeto.Csinal_processador.in);
-            objeto.Csinal_processador.filt = CIFilterBank(objeto.freq_amost, objeto.num_canais, objeto.low_freq, objeto.Csinal_processador.in,Cpaciente(objeto.paciente).bandwidths_in);
+            %objeto.Csinal_processador.filt = cochlearFilterBank(objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in);
+            objeto.Csinal_processador.filt = CIFilterBank(objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in,Cpaciente(objeto.paciente).bandas_freq_entrada);
         end 
     
         function ext_env(objeto)
@@ -125,7 +124,7 @@ classdef Cprocessador < handle
         end
         
         function saida = vocoder(objeto,flag)
-            saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,objeto.tipo_vocoder,Cpaciente(objeto.paciente).bandwidths_in,Cpaciente(objeto.paciente).upper_freq,Cpaciente(objeto.paciente).lower_freq,objeto.vet_tempo);
+            saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,objeto.tipo_vocoder,Cpaciente(objeto.paciente).bandas_freq_entrada,Cpaciente(objeto.paciente).sup_freq,Cpaciente(objeto.paciente).inf_freq,objeto.vet_tempo);
             if flag == 1
             nv = 'vocoder_';
             audiowrite(strcat(nv,objeto.tipo_vocoder,'_',objeto.nome),saida,objeto.freq_amost)

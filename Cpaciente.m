@@ -13,19 +13,19 @@ classdef Cpaciente < handle
     properties (Dependent)            
         empresa
         estrategia
-        numero_canais
+        num_canais
         maxima
-        inter_phase_gap
+        interphase_gap
         largura_pulso
         T_SPL
         C_SPL
         fat_comp
-        T_corr
-        C_corr
-        lower_freq
-        upper_freq
-        center_freq
-        bandwidths_in
+        amp_corr_T
+        amp_corr_C
+        inf_freq
+        sup_freq
+        central_freq
+        bandas_freq_entrada
     end
     
     methods 
@@ -58,52 +58,52 @@ classdef Cpaciente < handle
             end
         end
         
-        function numero_canais = get.numero_canais(objeto)
+        function num_canais = get.num_canais(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            numero_canais = objeto.paciente_cochlear_media_vetor(1);
+            num_canais = objeto.paciente_cochlear_media_vetor(1);
             else
-            numero_canais = dlmread(objeto.arquivo_dat,'\t',[15 0 36 0]);
+            num_canais = dlmread(objeto.arquivo_dat,'\t',[15 0 36 0]);
             end
         end
         
-        function T_corr = get.T_corr(objeto)
+        function amp_corr_T = get.amp_corr_T(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            T_corr = objeto.paciente_cochlear_media_matriz(:,3);
+            amp_corr_T = objeto.paciente_cochlear_media_matriz(:,3);
             else
-            T_corr = dlmread(objeto.arquivo_dat,'\t',[15 3 36 3]);
+            amp_corr_T = dlmread(objeto.arquivo_dat,'\t',[15 3 36 3]);
             end
         end
         
-        function C_corr = get.C_corr(objeto)
+        function amp_corr_C = get.amp_corr_C(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            C_corr = objeto.paciente_cochlear_media_matriz(:,4);
+            amp_corr_C = objeto.paciente_cochlear_media_matriz(:,4);
             else
-            C_corr = dlmread(objeto.arquivo_dat,'\t',[15 4 36 4]);
+            amp_corr_C = dlmread(objeto.arquivo_dat,'\t',[15 4 36 4]);
             end
         end
         
-        function lower_freq = get.lower_freq(objeto)
+        function inf_freq = get.inf_freq(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            lower_freq = objeto.paciente_cochlear_media_matriz(:,9);
+            inf_freq = objeto.paciente_cochlear_media_matriz(:,9);
             else
-            lower_freq = dlmread(objeto.arquivo_dat,'\t',[15 9 36 9]);
+            inf_freq = dlmread(objeto.arquivo_dat,'\t',[15 9 36 9]);
             end
         end
         
-        function upper_freq = get.upper_freq(objeto)
+        function sup_freq = get.sup_freq(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            upper_freq = objeto.paciente_cochlear_media_matriz(:,10);
+            sup_freq = objeto.paciente_cochlear_media_matriz(:,10);
             else
-            upper_freq = dlmread(objeto.arquivo_dat,'\t',[15 10 36 10]);
+            sup_freq = dlmread(objeto.arquivo_dat,'\t',[15 10 36 10]);
             end
         end
         
-        function bandwidths_in = get.bandwidths_in(objeto)
-            bandwidths_in = objeto.upper_freq - objeto.lower_freq;
+        function bandas_freq_entrada = get.bandas_freq_entrada(objeto)
+            bandas_freq_entrada = objeto.sup_freq - objeto.inf_freq;
         end
         
-        function center_freq = get.center_freq(objeto)
-            center_freq = (objeto.upper_freq + objeto.lower_freq)./2;
+        function central_freq = get.central_freq(objeto)
+            central_freq = (objeto.sup_freq + objeto.inf_freq)./2;
         end
         
         function largura_pulso = get.largura_pulso(objeto)
@@ -122,11 +122,11 @@ classdef Cpaciente < handle
             end
         end
         
-        function inter_phase_gap = get.inter_phase_gap(objeto)
+        function interphase_gap = get.interphase_gap(objeto)
             if strcmp(objeto.arquivo_dat,'media') == 1
-            inter_phase_gap = objeto.paciente_cochlear_media_vetor(3);
+            interphase_gap = objeto.paciente_cochlear_media_vetor(3);
             else
-            inter_phase_gap = dlmread(objeto.arquivo_dat,'\t',[4 1 4 1]);
+            interphase_gap = dlmread(objeto.arquivo_dat,'\t',[4 1 4 1]);
             end
         end
         
@@ -168,13 +168,13 @@ classdef Cpaciente < handle
         
 %% BLOCOS
 
-%         function media_paciente(objeto)
-%             if strcmp(objeto.empresa,'Cochlear')
-%             [objeto.paciente_cochlear_media_matriz, ~] = media_paciente_cochlear(objeto.quantidade_media,objeto.modelo_arquivo_cochlear,objeto.excluir_media);
-%             else
-%                 error('Dados de pacientes de outras empresas ainda não foram adicionados')
-%             end
-%         end
+        function media_paciente(objeto)
+            if strcmp(objeto.empresa,'Cochlear')
+            [objeto.paciente_cochlear_media_matriz, ~] = media_paciente_cochlear(objeto.quantidade_media,objeto.modelo_arquivo_cochlear,objeto.excluir_media);
+            else
+                error('Dados de pacientes de outras empresas ainda não foram adicionados')
+            end
+        end
     end       
 end
 
