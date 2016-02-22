@@ -23,21 +23,41 @@ sim.vocoder(1);
 display(sim);
 display(sim.Csinal_processador)
 
+%% Reconstrução
+
 data = Cdados(sim);
 PulsosCorr = data.calcOndas();
-a=1;
+figure(1)
+plot(PulsosCorr(22,:))
+hold on
+fat_smooth = 100;
+corr_esp = 'Exp'; % 'Exp' ou 'Gauss'
+[audio_reconst, env_seno , senos, t_reconst] = reconst(PulsosCorr,sim.num_canais,fat_smooth,data.freq2,corr_esp);
+
+PulsosCorr = abs(PulsosCorr);    
 for i = 1:size(PulsosCorr,1)
-    for j = 1:size(PulsosCorr,2)
-        if PulsosCorr(i,j)<0
-           PulsosCorr(i,j) = 0;
-        end 
-    end
+for j = 2:size(PulsosCorr,2)-1
+   if PulsosCorr(i,j)==0 && PulsosCorr(i,j-1)==PulsosCorr(i,j+1)
+      PulsosCorr(i,j) = PulsosCorr(i,j-1); 
+   end
 end
+end
+    
+for i = 50000:60000
+plot(env_seno(:,i))
+hold on
+end
+hold off
 
-fat_smooth = 500;
-[audio_reconst, env_seno , senos] = reconst(PulsosCorr,sim.num_canais,fat_smooth,data.freq2);
-
-
+plot(env_seno(:,50000))
+% 
+% for i = 1:22
+% plot(PulsosCorr(i,:))
+% hold on
+% end
+% hold off
+%audiowrite('CI22_700pps.wav',0.5*audio_reconst,data.freq2)
+sound(audio_reconst,data.freq2)
 %% Etapas dos sinais
 
 % n = 1;
@@ -142,4 +162,20 @@ fat_smooth = 500;
 % % ylim([2e2 8e3])
 % colormap(jet);
 % view(0,90);
+
+
+% [y, f, t, p] = spectrogram(audio_reconst,128,120,128,data.freq2,'yaxis');
+% figure(3);
+% surf(t,f,p,'EdgeColor','none');
+% axis xy; 
+% axis tight;
+% %set(gca,'Yscale','log')
+% set(gca,'XTick',[])
+% set(gca,'YTick',[])
+% ylim([2e2 8e3])
+% zlim([0 1e-4])
+% colormap(jet);
+% view(0,90);
+% ylabel('Frequency (Hz) ');
+% xlabel('Time ');
 
