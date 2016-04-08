@@ -24,7 +24,7 @@ classdef Cdados
         baixa_freq;       % Frequencia central do filtro de baixa frequencia
         nome;           % Nome do arquivo de entrada de audio
         famost;
-        NF = 1;       % Discretização da nova freq amost
+        NF = 5;       % Discretização da nova freq amost
 
     end
     properties(Dependent)
@@ -63,11 +63,12 @@ classdef Cdados
         end
         
         function f2=get.freq2(obj)
-            f2=3*obj.famost;
+            %f2=obj.NF*obj.famost;
+            f2=obj.NF*(obj.maxima*obj.taxa_est);
         end
         
         function [ondas, tempo] = calcOndas(obj)
-            f2=obj.freq2;
+            f2=obj.NF*(obj.maxima*obj.taxa_est);
             tmax=zeros(1,obj.num_canais);
             for n = 1:obj.num_canais
                 vn = strcat('E',num2str(n));
@@ -77,14 +78,16 @@ classdef Cdados
 
             tend=max(tmax)+2*obj.largura_pulso+obj.interphase_gap;
             npoints=ceil(tend*f2);
-            tempo=(1:npoints)*1/obj.freq2;
+            %tempo=(1:npoints)*1/obj.freq2;
+            tempo=(1:npoints)/(obj.maxima*obj.taxa_est);
             ondas=zeros(obj.num_canais,npoints);
 
             for n = 1:obj.num_canais
                 vn = strcat('E',num2str(n));
                 tc = obj.Pulsos.(vn);
-                ondas(n,:)=calcOndas(tc, f2, obj.tipo_pulso, ...
-                    obj.largura_pulso, tempo);                
+                [~,ondas(n,:)]=calcOndas(tc, f2, obj.tipo_pulso, ...
+                ...%1/(obj.maxima*obj.taxa_est), tempo); 
+                obj.largura_pulso, tempo);                
             end
         end
     end

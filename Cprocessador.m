@@ -16,7 +16,7 @@ classdef Cprocessador < handle
         taxa_est = 1000 % Taxa de estimulacao do gerador de pulsos
         quant_bits = 8 % Número de bits para divisão da faixa dinamica
         fat_comp = 0.6 % fator de compressao (expoente para a lei da potencia)
-        fase_pulso = 'Catodico' % Fase inicial do pulso: Anodico (-) ou Catodico (+)
+        fase_pulso = 'Catodico' % Fase inicial do pulso: Anodico (+) ou Catodico (-)
         amp_corr_T  % Limiar da amplitude de corrente por banda
         amp_corr_C % Maximo conforto para amplitude de corrente por banda
         max_corr = 1.75e-3 % Maxima corrente do gerador
@@ -25,6 +25,16 @@ classdef Cprocessador < handle
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome % Nome do arquivo de entrada de audio
         tipo_vocoder = 'Senoidal' % Formato de onda para reconstrucao com vocoder: 'Ruido' / 'Senoidal'
+        fat_smooth = 100;
+        corr_esp = 'Gauss'; % 'Exp' ou 'Gauss'
+        nome_reconst
+        CorrDist
+        Spike_matrix
+        V_mem
+        Ap
+        audio_reconst
+        pasta
+        lambda = 3; % Monopolar 8-11mm / Bipolar 2-4mm
     end
     
     properties (Dependent)
@@ -126,11 +136,20 @@ classdef Cprocessador < handle
         function saida = vocoder(objeto,flag)
             saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,objeto.tipo_vocoder,Cpaciente(objeto.paciente).bandas_freq_entrada,Cpaciente(objeto.paciente).sup_freq,Cpaciente(objeto.paciente).inf_freq,objeto.vet_tempo);
             if flag == 1
-            nv = 'vocoder_';
-            audiowrite(strcat(nv,objeto.tipo_vocoder,'_',objeto.nome),saida,objeto.freq_amost)
+            nv = '_vocoder_hc.wav';
+            audiowrite(char(strcat(objeto.nome_reconst,nv)),saida,objeto.freq_amost)
             end
         end
-
+        
+        function neural_vocoder(objeto,PulsosCorr,freq2,flag)
+            [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap,objeto.audio_reconst] = neural_vocoder(PulsosCorr,objeto.num_canais,objeto.freq_amost,freq2,objeto.corr_esp,objeto.tipo_vocoder,objeto.lambda);
+            %sound(objeto.audio_reconst,objeto.freq_amost)
+            if flag == 1
+            nv = strcat('_neural_vocoder_hc','.wav');
+            audiowrite(char(strcat(objeto.nome_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
+            end
+        end       
+        
     end
 end
    

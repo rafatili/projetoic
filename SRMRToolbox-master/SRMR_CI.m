@@ -90,8 +90,11 @@ wInc = ceil(wIncS*fs); % window increment in samples
     % outputs at each critical band.
     % The dimensions will be: cochlearOutputs(nCochlearFilters, nSamples), with 
     % the last being lowest frequency, and the first being highest frequency. 
-    [cochlearOutputs, bandwidths] = CIFilterBank(fs, nCochlearFilters, lowFreq, s);
-
+    bandwidths = [1000;875;750;625;625;500;500;375;375;250;250;250;250;125;125;125;125;125;125;125;125;125];
+    %[cochlearOutputs, bandwidths] = CIFilterBank(fs, nCochlearFilters, lowFreq, s, bandwidths);
+    
+    [cochlearOutputs, bandwidths] = CIFilterBank(fs, 22, 150, s, bandwidths);
+    
     % Compute the temporal envelope for each critical band.  The dimensions will
     % be: temporalEnvelopes(nCochlearFilters, nSamples)
     tempEnv = abs(hilbert(cochlearOutputs'))';    
