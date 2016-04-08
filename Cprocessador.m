@@ -35,6 +35,7 @@ classdef Cprocessador < handle
         audio_reconst
         pasta
         lambda = 3; % Monopolar 8-11mm / Bipolar 2-4mm
+        dtn_A = 35e-3;
     end
     
     properties (Dependent)
@@ -142,7 +143,7 @@ classdef Cprocessador < handle
         end
         
         function neural_vocoder(objeto,PulsosCorr,freq2,flag)
-            [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap,objeto.audio_reconst] = neural_vocoder(PulsosCorr,objeto.num_canais,objeto.freq_amost,freq2,objeto.corr_esp,objeto.tipo_vocoder,objeto.lambda);
+            [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap,objeto.audio_reconst] = neural_vocoder(PulsosCorr,objeto.num_canais,objeto.freq_amost,freq2,objeto.corr_esp,objeto.tipo_vocoder,objeto.lambda,objeto.dtn_A);
             %sound(objeto.audio_reconst,objeto.freq_amost)
             if flag == 1
             nv = strcat('_neural_vocoder_hc','.wav');

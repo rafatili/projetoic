@@ -1,4 +1,4 @@
-function [CorrDist,Spike_matrix, V_mem, Ap,audio] = neural_vocoder(PulsosCorr,num_canais,freq_amost,freq2,corr_esp,tipo_vocoder,lambda)
+function [CorrDist,Spike_matrix, V_mem, Ap,audio] = neural_vocoder(PulsosCorr,num_canais,freq_amost,freq2,corr_esp,tipo_vocoder,lambda,dtn_A)
 
 %% Propriedades
 
@@ -55,7 +55,6 @@ pos_eletrodo = (dx_eletrodo + pos_inicial):dx_eletrodo:(num_canais*dx_eletrodo +
 comp_coclea = 24; % mm
 dx_coclea = comp_coclea/N_neurons; % mm
 x_coclea = 0:dx_coclea:comp_coclea-dx_coclea;
-lambda = 2.4;
 
 %% Distribuicao da corrente
 
@@ -141,7 +140,7 @@ toc
 W = 1:N_neurons_pop;
 Wn = pdf('norm',W,mean(W),1);
 Wn = Wn/max(Wn);
-dtn_A = 35e-3;
+%dtn_A = 5e-3;
 n_A = ceil(dtn_A*freq2);
 N_A = round(size(Spike_matrix,2)/n_A);
 
@@ -294,7 +293,7 @@ switch(tipo_vocoder)
             f1 = 165.4*(10^(0.06*(33-max(pos_eletrodo))-1));
             Bandas = cochlearFilterBank(freq_amost, size(audio,1), f1 , Ruido);%;, bandwidths_in);            
             %Bandas = CIFilterBank(freq_amost, size(audio,1), 150, Ruido, flipud(bandwidths_in));
-            %Bandas = flipud(Bandas);
+            Bandas = flipud(Bandas);
             Audio_bandas = Bandas.*audio;     
             Audio_out = zeros(size(audio,2),1)';
             for i = 1:size(audio,1) % Composicao de todas as bandas de audio
@@ -325,7 +324,7 @@ switch(tipo_vocoder)
         
         f1 = 165.4*(10^(0.06*(33-max(pos_eletrodo))-1));
             Bandas = cochlearFilterBank(freq_amost, size(audio,1), f1 , SOMA);%;, bandwidths_in);
-            %Bandas = flipud(Bandas);
+            Bandas = flipud(Bandas);
             Audio_bandas = Bandas.*audio;     
             Audio_out = zeros(size(audio,2),1)';
             for i = 1:size(audio,1) % Composicao de todas as bandas de audio
