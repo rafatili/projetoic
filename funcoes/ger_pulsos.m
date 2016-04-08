@@ -1,9 +1,9 @@
 function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_est,tipo_pulso,largura_pulso,interphase_gap,fase_pulso,atraso,max_corr,quant_bits)
 
             if strcmp(fase_pulso,'Catodico') == 1 
-                fase = 1;
-            elseif strcmp(fase_pulso,'Anodico') == 1
                 fase = -1;
+            elseif strcmp(fase_pulso,'Anodico') == 1
+                fase = 1;
             end
                                     
             t = 0;
@@ -27,7 +27,7 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
 
                 for j = 1:num_canais:T_total*taxa_est*num_canais - num_canais + 2                   
                     n = 0;                         
-                    for i = num_canais:-1:1                        
+                    for i = 1:num_canais                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
                                 saida.(strcat('E',num2str(i)))(a,:) = [t , fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)]; 
                                 t = t + largura_pulso + interphase_gap;
@@ -54,25 +54,22 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                 resamp = entrada;
           end
             
-           for i = num_canais:-1:1 
-               a(i) = 1;
-           end                 
+
+               a = ones(num_canais,1);
+               
                 for j = 1:maxima:T_total*taxa_est*num_canais - maxima + 2                                          
                     
-                    maxima_vet = zeros(1,num_canais);
-                    for i = num_canais:-1:1 
-                       maxima_vet(i) = resamp(i,j);
-                    end
+                       maxima_vet = resamp(:,j);
                        [maxima1, maxima2] = sort(maxima_vet,'descend');
                        maxima_valor = maxima1(1:maxima);
                        maxima_canal = maxima2(1:maxima);
-                       [maxima_vet2, maxima_vet3] = sort(maxima_canal,'descend');
-                       
-                    for i = 1:maxima                        
-                        if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
+                       [maxima_vet2, maxima_vet3] = sort(maxima_canal,'ascend');
+                    
+                    if strcmp(tipo_pulso,'Bifasico') == 1   
+                        for i = maxima:-1:1                                                                          
+                                saida.(strcat('E',num2str(num_canais-maxima_vet2(i)+1)))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
                                 t = t + largura_pulso + interphase_gap;
-                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
+                                saida.(strcat('E',num2str(num_canais-maxima_vet2(i)+1)))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
                                 t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
                                 a(maxima_vet2(i)) = a(maxima_vet2(i)) + 2;
                         end                     

@@ -21,9 +21,10 @@ classdef Cdados
         max_corr;       % Maxima corrente do gerador
         atraso;         % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente;       % Utilizacao das informacoes do 'paciente padrao' da clase
-        low_freq;       % Frequencia central do filtro de baixa frequencia
+        baixa_freq;       % Frequencia central do filtro de baixa frequencia
         nome;           % Nome do arquivo de entrada de audio
         famost;
+        NF = 5;       % Discretização da nova freq amost
 
     end
     properties(Dependent)
@@ -55,18 +56,19 @@ classdef Cdados
             obj.max_corr = Y.max_corr;
             obj.atraso = Y.atraso;
             obj.paciente = Y.paciente;
-            obj.low_freq = Y.low_freq;
+            obj.baixa_freq = Y.baixa_freq;
             obj.nome = Y.nome;
             obj.famost = Y.freq_amost;
             
         end
         
         function f2=get.freq2(obj)
-            f2=20*obj.famost;
+            %f2=obj.NF*obj.famost;
+            f2=obj.NF*(obj.maxima*obj.taxa_est);
         end
         
         function [ondas, tempo] = calcOndas(obj)
-            f2=obj.freq2;
+            f2=obj.NF*(obj.maxima*obj.taxa_est);
             tmax=zeros(1,obj.num_canais);
             for n = 1:obj.num_canais
                 vn = strcat('E',num2str(n));
@@ -76,14 +78,16 @@ classdef Cdados
 
             tend=max(tmax)+2*obj.largura_pulso+obj.interphase_gap;
             npoints=ceil(tend*f2);
-            tempo=(1:npoints)*1/obj.freq2;
+            %tempo=(1:npoints)*1/obj.freq2;
+            tempo=(1:npoints)/(obj.maxima*obj.taxa_est);
             ondas=zeros(obj.num_canais,npoints);
 
             for n = 1:obj.num_canais
                 vn = strcat('E',num2str(n));
                 tc = obj.Pulsos.(vn);
-                ondas(n,:)=calcOndas(tc, f2, obj.tipo_pulso, ...
-                    obj.largura_pulso, tempo);                
+                [~,ondas(n,:)]=calcOndas(tc, f2, obj.tipo_pulso, ...
+                ...%1/(obj.maxima*obj.taxa_est), tempo); 
+                obj.largura_pulso, tempo);                
             end
         end
     end
