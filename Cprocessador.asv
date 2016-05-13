@@ -25,7 +25,19 @@ classdef Cprocessador < handle
         paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome % Nome do arquivo de entrada de audio
- 
+        tipo_vocoder = 'Senoidal' % Formato de onda para reconstrucao com vocoder: 'Ruido' / 'Senoidal'
+        fat_smooth = 100;
+        corr_esp = 'Gauss'; % 'Exp' ou 'Gauss'
+        nome_reconst
+        CorrDist
+        Spike_matrix
+        V_mem
+        Ap
+        audio_reconst
+        pasta
+        lambda = 3; % Monopolar 8-11mm / Bipolar 2-4mm
+        dtn_A = 35e-3;
+        %freq_amost = 16e3; % Frequencia de amostragem
     end
     
     properties (Dependent)
@@ -53,7 +65,6 @@ classdef Cprocessador < handle
             objeto.maxima = Cpaciente(objeto.paciente).maxima;
             objeto.interphase_gap = mean(Cpaciente(objeto.paciente).interphase_gap)*1e-6;
             objeto.largura_pulso1 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
-            objeto.largura_pulso2 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
             objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
             objeto.amp_corr_T = Cpaciente(objeto.paciente).amp_corr_T(1:objeto.num_canais);
             objeto.amp_corr_C = Cpaciente(objeto.paciente).amp_corr_C(1:objeto.num_canais);
@@ -88,7 +99,7 @@ classdef Cprocessador < handle
         end
         
         function max_corr_paciente = get.max_corr_paciente(objeto)
-                max_corr_paciente = objeto.max_corr*(1e-2)*10.^(objeto.amp_corr_C/(2^objeto.num_bits-1));
+                max_corr_paciente = objeto.max_corr*(e-2)*10^;
         end
         
 %% OUTRAS FUNÇÕES
@@ -132,7 +143,24 @@ classdef Cprocessador < handle
             ext_env(objeto)
             comp(objeto)
             ger_pulsos(objeto)
-        end                     
+        end
+        
+        function saida = vocoder(objeto,flag)
+            saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,objeto.tipo_vocoder,Cpaciente(objeto.paciente).bandas_freq_entrada,Cpaciente(objeto.paciente).sup_freq,Cpaciente(objeto.paciente).inf_freq,objeto.vet_tempo);
+            if flag == 1
+            nv = '_vocoder_hc.wav';
+            audiowrite(char(strcat(objeto.nome_reconst,nv)),saida,objeto.freq_amost)
+            end
+        end
+        
+        function neural_vocoder(objeto,PulsosCorr,freq2,flag)
+            [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap,objeto.audio_reconst] = neural_vocoder(PulsosCorr,objeto.num_canais,objeto.freq_amost,freq2,objeto.corr_esp,objeto.tipo_vocoder,objeto.lambda,objeto.dtn_A);
+            %sound(objeto.audio_reconst,objeto.freq_amost)
+            if flag == 1
+            nv = strcat('_neural_vocoder_hc','.wav');
+            audiowrite(char(strcat(objeto.nome_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
+            end
+        end       
         
     end
 end

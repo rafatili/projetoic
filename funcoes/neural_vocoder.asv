@@ -1,6 +1,6 @@
 function [CorrDist,Spike_matrix, V_mem, Ap,audio] = neural_vocoder(PulsosCorr,num_canais,...
-    freq_amost,freq2,corr_esp,carrier,lambda,dtn_A,N_neurons,R_mem, C_mem,dt_refrat_abs,...
-    Vthr_mem, V_rest_mem,V_ruido_mem, pos_inicial, dx_eletrodo, R_canal)
+    freq_amost,freq2,corr_esp,tipo_vocoder,lambda,dtn_A,N_neurons,R_mem, C_mem,dt_refrat_abs,...
+    Vthr_mem, V_rest_mem,V_ruido_mem )
 
 %% Propriedades
 
@@ -22,14 +22,17 @@ V_thr = random('norm',mean(Vthr_mem),V_thr_desv,N_neurons,1);
 V_rest_desv = abs(max(V_rest_mem) - mean(V_rest_mem))/3;
 V_rest = random('norm',mean(V_rest_mem),V_rest_desv,N_neurons,size(PulsosCorr,2));
 
-V_ruido_desv = abs(max(V_ruido_mem) - mean(V_ruido_mem))/3;
-V_ruido = random('norm',mean(V_ruido_mem),V_ruido_desv,N_neurons,size(PulsosCorr,2));
+V_ruido_media = mean([V_ruido_max V_ruido_min]);
+V_ruido_desv = abs(V_ruido_max - V_ruido_media)/3;
+V_ruido = random('norm',V_ruido_media,V_ruido_desv,N_neurons,size(PulsosCorr,2));
 
+pos_inicial = 0; % mm
+dx_eletrodo = 1; % mm
 pos_eletrodo = (dx_eletrodo + pos_inicial):dx_eletrodo:(num_canais*dx_eletrodo + pos_inicial);
 
-comp_coclea = 24; % comprimento onde neurônios considerados estão localizados [mm]
-dx_coclea = comp_coclea/N_neurons; % distância entre neurônios [mm]
-x_coclea = 0:dx_coclea:comp_coclea-dx_coclea; % vetor de posição dos neurônios [mm]
+comp_coclea = 24; % mm
+dx_coclea = comp_coclea/N_neurons; % mm
+x_coclea = 0:dx_coclea:comp_coclea-dx_coclea;
 
 %% Distribuicao da corrente
 
@@ -77,6 +80,7 @@ for i = 1:size(CorrDist,2)
 end
 Spike_matrix = zeros(size(CorrDist)); % matriz de spikes
 an = zeros(size(CorrDist,1));
+R_canal = 5e3; % resistencia dos canais do implante
 
 dt = 1/freq2;
 tic
@@ -247,7 +251,7 @@ toc
             SOMA = 0;
             senos = zeros(size(audio));
             
-switch(carrier)
+switch(tipo_vocoder)
     case 'Senoidal'
             for i = 1:size(audio,1)  
                 f_coclea = 165.4*(10^(0.06*(33-pos_eletrodo(i)))-1);

@@ -2,129 +2,93 @@
 
 clear classes
 clear all
+%close all
 clc
 addpath(genpath('./funcoes'))
 addpath(genpath('./SRMRToolbox-master'))
+addpath(genpath('./wideband'))
+addpath(genpath('./sinais_entrada'))
+addpath(genpath('./dados_pacientes'))
+% fs = 16e3;
+% resamp_audio('fiz.wav','./monossilabas/fiz_16k.wav',fs)
+nome_in = 'chão_16k';    
 
-nome_in = 'televisao';    
-%nome_in = 'SENO_1kHz.wav';
-sim = Cprocessador(strcat(nome_in,'.wav'), './dados_pacientes/p_cochlear_padrao.dat');
-sim.nome_reconst = nome_in;
-%sim.nome_reconst = strcat(nome_in);
+%% Processador
+
+sim = Cprocessador(strcat(nome_in,'.wav'), 'p_cochlear_padrao.dat');
 sim.num_canais = 22;
-sim.maxima = 10;
-sim.taxa_est = 900;
+sim.maxima = 22;
+sim.taxa_est = 600;
 sim.tipo_env = 'Hilbert';
-%sim.tipo_env = 'Retificacao';
-%sim.fat_comp = 0.6;
+sim.largura_pulso1 = 25e-6;
+sim.largura_pulso2 = 35e-6;
+sim.interphase_gap = 8e-6;
+sim.fat_comp = 0.4;
 
 tic
 sim.cis_ace();
 toc
-%%
-sim.tipo_vocoder = 'Harmonic Complex';
-%sim.vocoder(1);
-data = Cdados(sim);
-%sim.lambda = lc(il);
-sim.corr_esp = 'Gauss';
-sim.fat_smooth = 10;
-data.NF = 15;
-sim.dtn_A = 35e-4;
-sim.neural_vocoder(data.calcOndas(),data.freq2,1);
 
-%% Plot
-close all
+% plot(sim.Csinal_processador.comp(1:sim.num_canais,:)')
+% ylim([min(sim.amp_corr_T) max(sim.amp_corr_C)])
+%plot(sim.Csinal_processador.corr_onda.E22(:,2)')
+% hold on
+
+%% Reconstrução 
+
+data = Creconst(sim);
+data.nome_reconst = nome_in;
+% data.carrier = 'Harmonic Complex';
+% data.vocoder(1);
+% % data.lambda = lc(il);
+% sim.corr_esp = 'Exp';
+data.NF = 10;
+% data.dtn_A = 35e-3;
+% data.N_neurons = 50;
+% data.neural_vocoder(1);
+data.calcOndas();
+figure
+plot(data.tempo,data.ondas(:,:))
+xlabel('t(s)')
+ylabel('corrente (A)')
+xlim([0.695 0.7015])
+ylim([-sim.max_corr sim.max_corr])
+
+%% Reconstrução Neural-vocoder
+
+% close all
+% figure(2)
+% plot(sim.vet_tempo,sim.Csinal_processador.in)
+% xlabel('Tempo(s)')
+% ylabel('Amplitude')
+% 
 % [y,x] = find(sim.Spike_matrix);
-% x = x/data.freq2;
+% x = x/(2*data.freq2);
 % figure(1)
 % plot(x,y,'.k','MarkerSize',2)
-% xlim([0.249 0.251])
-% ylim([0 1000])
+% %xlim([0 0.251])
+% ylim([0 max(y)])
 % xlabel('Tempo(s)')
 % ylabel('Neurônio "n" (da base ao ápice)')
-% %set(gca,'Ydir','reverse')
-
-% Pulsos = data.calcOndas();
-% figure(2)
-% plot(Pulsos(1,:))
-% hold on
-% plot(Pulsos(22,:),'r')
-% hold off
-% figure(2)
-% plot(sim.CorrDist(:,1000:20000))
-% 
-% 
-% 
-
-%% AP
-x_Ap = (1:size(sim.Ap,2))*sim.dtn_A;
-y_Ap = 1:size(sim.Ap,1);
-figure(3);
-subplot(2,1,1)
-surface(x_Ap,y_Ap,sim.Ap,'EdgeColor','none')
-colormap(jet)
-%zlim([0 1500])
-view(0, 270)
-%set(gca,'Ydir','reverse')
-nc = 10;
-lt = 0.25;
-A = sim.Ap(nc,:)';
-% for j=1:length(A)
-%     if A(j)>=lt && A(j)<1                                         
-%     A(j) = (-log(1./A(j) - 1) + 1)/6 + .01644;
-%     %audio(i,j) = audio(i,j)^(1/0.6);
-%     elseif A(j)<lt
-%     A(j) = 0; 
-%     else
-%     A(j) = 1; 
-%     end
-% end
-A = A/max(A);
-subplot(2,1,2)
-plot(x_Ap,A)
-hold on
-plot(sim.vet_tempo,sim.Csinal_processador.env(nc,:)/max(sim.Csinal_processador.env(nc,:)),'r')
-hold off
-%%
-% [y, f, t, p] = spectrogram(sim.Csinal_processador.in,128,120,128,sim.freq_amost,'yaxis');
-% figure(4);
-% surf(t,f,10*log10(abs(p)),'EdgeColor','none');
-% axis xy; 
-% axis tight;
-% %set(gca,'Yscale','log')
-% set(gca,'XTick',[])
-% set(gca,'YTick',[])
-% ylim([2e2 8e3])
-% colormap(jet);
-% view(0,90);
-% % ylabel('Frequency (Hz) ');
-% % xlabel('Time ');
-
-%end
-
-
-
-%% Reconstrucao Nervo Auditivo
-%freq2 = 32e3;
-% [CorrDist,Spike_matrix,~,Ap] = reconst_neuro(PulsosCorr,sim.num_canais,data.freq2);
-% 
-% [y,x] = find(Spike_matrix);
-% x = x/data.freq2;
-% figure(1)
-% plot(x,y,'.k','MarkerSize',2)
-% xlim([0 3.5])
-% ylim([0 max(y)])
 % set(gca,'Ydir','reverse')
-% figure(2)
-% plot(Ap(20,:))
-% 
-% x_Ap = (1:size(Ap,2))*35e-3;
-% y_Ap = 1:size(Ap,1);
+
+
+% AP
+% x_Ap = (1:size(data.Ap,2))*data.dtn_A/2;
+% y_Ap = 1:size(data.Ap,1);
 % figure(3);
-% surface(x_Ap,y_Ap,Ap,'EdgeColor','none')
+% % subplot(2,1,1)
+% surface(x_Ap,y_Ap,data.Ap,'EdgeColor','none')
+% c=colorbar
 % colormap(jet)
-% zlim([0 200])
+% ylim([1 22])
+% %caxis([0 5])
+% xlim([data.dtn_A max(x_Ap)])
+% xlabel('Tempo(s)')
+% ylabel('População no eletrodo "N" (da base ao ápice)')
+% ylabel(c,'Taxa de disparos (spikes/s)')
 % view(0, 270)
+%set(gca,'Ydir','reverse')
 
 %% Etapas dos sinais
 
@@ -184,23 +148,26 @@ hold off
 % 
 
 %% Eletrodograma
-% 
+
 % canal_min = 1;
-% canal_max = 22;
-% figure(4)
+% canal_max = sim.num_canais;
+% figure
 % for n = 1:canal_max
 % h = subplot(canal_max-canal_min+1,1,n);
 % vn = strcat('E',num2str(n));
 % tc = sim.Csinal_processador.corr_onda.(vn);
 % bar(tc(:,1),tc(:,2))
-% xlim([0 max(sim.vet_tempo)])
+% %xlim([0 2*max(sim.vet_tempo)])
 % ylim([0 sim.max_corr])
+% %ylim([0 1.25*abs(max(tc(:,2)))])
+% %ylim([0 sim.max_corr_paciente(n)])
 % set(h,'XTick',[])
 % set(h,'YTick',[])
 % ylabel(strcat('E',num2str(n)))
 % end
-% 
-% Espectrograma FFT
+
+
+%% Espectrograma FFT
 
 % [y, f, t, p] = spectrogram(sim.Csinal_processador.in,128,120,128,sim.freq_amost,'yaxis');
 % figure(3);
@@ -232,19 +199,4 @@ hold off
 % colormap(jet);
 % view(0,90);
 
-
-% [y, f, t, p] = spectrogram(audio_reconst,128,120,128,data.freq2,'yaxis');
-% figure(3);
-% surf(t,f,p,'EdgeColor','none');
-% axis xy; 
-% axis tight;
-% %set(gca,'Yscale','log')
-% set(gca,'XTick',[])
-% set(gca,'YTick',[])
-% ylim([2e2 8e3])
-% zlim([0 1e-4])
-% colormap(jet);
-% view(0,90);
-% ylabel('Frequency (Hz) ');
-% xlabel('Time ');
 

@@ -1,11 +1,35 @@
-function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_est,tipo_pulso,largura_pulso,interphase_gap,fase_pulso,atraso,max_corr,quant_bits)
+function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_est,tipo_pulso,largura_pulso1,largura_pulso2,interphase_gap,fase_pulso,atraso,max_corr,quant_bits,amp_corr_T,amp_corr_C)
 
-            if strcmp(fase_pulso,'Catodico') == 1 
-                fase = -1;
-            elseif strcmp(fase_pulso,'Anodico') == 1
-                fase = 1;
+            if (largura_pulso1 + interphase_gap + largura_pulso2) > 1/(maxima*taxa_est)
+                error('Erro: (largura_pulso1 + largura_pulso2 + interphase_gap) > 1/(maxima*taxa_est) -> Isso gera interação entre canais!')
+                stop
             end
-                                    
+            
+            if largura_pulso1==largura_pulso2
+                fase1 = 1;
+                fase2 = fase1;
+            else
+                fase1 = largura_pulso2/largura_pulso1;
+                fase2 = largura_pulso1/largura_pulso2;
+                if fase1>fase2                    
+                    fase2 = fase2/fase1;
+                    fase1 = 1;
+                elseif fase1<fase2
+                    fase1 = fase1/fase2;
+                    fase2 = 1;
+                end
+            end            
+            
+            switch fase_pulso
+                case 'Catodico'
+                fase1 = -fase1;
+                fase2 = -fase2;
+            end
+             
+            for i = 1:num_canais 
+                saida.(strcat('E',num2str(i))) = [0 0];
+            end
+            
             t = 0;
             
 %% Estrategia CIS            
@@ -29,10 +53,11 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                     n = 0;                         
                     for i = 1:num_canais                        
                         if strcmp(tipo_pulso,'Bifasico') == 1                            
-                                saida.(strcat('E',num2str(i)))(a,:) = [t , fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)]; 
-                                t = t + largura_pulso + interphase_gap;
-                                saida.(strcat('E',num2str(i)))(a + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*resamp(i,j + n)];                                
-                                t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
+                                saida.(strcat('E',num2str(i)))(a,:) = [t , fase1*(max_corr/(2^quant_bits-1))*resamp(i,j + n)]; 
+                                t = t + largura_pulso1 + interphase_gap;
+                                saida.(strcat('E',num2str(i)))(a + 1,:) = [t , -fase2*(max_corr/(2^quant_bits-1))*resamp(i,j + n)];                                
+                                t = t - (largura_pulso1 + interphase_gap) + 1/(num_canais*taxa_est);                       
+                        
                         end                       
                         if atraso == 0
                            n = n + 1;
@@ -45,7 +70,8 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
       
           if maxima*taxa_est < freq_amost            
                 for i = 1:num_canais
-                    resamp(i,:) = resample(entrada(i,:), num_canais*taxa_est,freq_amost);               
+                    resamp(i,:) = resample(entrada(i,:), num_canais*taxa_est,freq_amost); 
+                    resamp(i,:) = resamp(i,:)/amp_corr_C(i);
                 end
           elseif maxima*taxa_est > freq_amost
                 error('Erro: frequencia de amostragem menor do que o produto do numero de maxima pela taxa de estimulacao!')
@@ -66,11 +92,12 @@ function saida = ger_pulsos(entrada,num_canais,maxima,freq_amost,T_total,taxa_es
                        [maxima_vet2, maxima_vet3] = sort(maxima_canal,'ascend');
                     
                     if strcmp(tipo_pulso,'Bifasico') == 1   
-                        for i = maxima:-1:1                                                                          
-                                saida.(strcat('E',num2str(num_canais-maxima_vet2(i)+1)))(a(maxima_vet2(i)),:) = [t , fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))]; 
-                                t = t + largura_pulso + interphase_gap;
-                                saida.(strcat('E',num2str(num_canais-maxima_vet2(i)+1)))(a(maxima_vet2(i)) + 1,:) = [t , -fase*(max_corr/(2^quant_bits-1))*maxima_valor(maxima_vet3(i))];                                
-                                t = t - (largura_pulso + interphase_gap) + 1/(num_canais*taxa_est);                       
+                        for i = 1:1:maxima                                                                          
+                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)),:) = [t , fase1*max_corr*(maxima_valor(maxima_vet3(i))*amp_corr_C(maxima_vet2(i))/(2^quant_bits-1))]; 
+                                t = t + largura_pulso1 + interphase_gap;
+                                saida.(strcat('E',num2str(maxima_vet2(i))))(a(maxima_vet2(i)) + 1,:) = [t , -fase2*max_corr*(maxima_valor(maxima_vet3(i))*amp_corr_C(maxima_vet2(i))/(2^quant_bits-1))];                                
+                                t = t - (largura_pulso1 + interphase_gap) + 1/(maxima*taxa_est);                       
+                                %t = t + 1/(num_canais*taxa_est); 
                                 a(maxima_vet2(i)) = a(maxima_vet2(i)) + 2;
                         end                     
                     end
