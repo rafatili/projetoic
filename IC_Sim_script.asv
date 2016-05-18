@@ -15,7 +15,7 @@ nome_in = 'chão_16k';
 
 %% Processador
 
-sim = Cprocessador(strcat(nome_in,'.wav'), 'p_cochlear_3.dat');
+sim = Cprocessador(strcat(nome_in,'.wav'), 'p_cochlear_1.dat');
 sim.num_canais = 22;
 sim.maxima = 8;
 sim.taxa_est = 900;
@@ -29,15 +29,15 @@ tic
 sim.cis_ace();
 toc
 %%
-% figure(1)
-% %plot(sim.vet_tempo,sim.Csinal_processador.comp(20,:)')
-% xlim([0.3 0.4])
-% ylim([130 200])
-% %plot(sim.Csinal_processador.corr_onda.E22(:,2)')
-% hold on
-% xlabel('t(s)')
-% ylabel('UC(1-255)')
-% legend('1','0,6','0,2','Location','NorthWest')
+figure(1)
+%plot(sim.vet_tempo,sim.Csinal_processador.comp(20,:)')
+xlim([0.3 0.4])
+ylim([130 200])
+%plot(sim.Csinal_processador.corr_onda.E22(:,2)')
+hold on
+xlabel('t(s)')
+ylabel('UC(1-255)')
+legend('1','0,6','0,2','Location','NorthWest')
 
 %% Reconstrução 
 
@@ -47,18 +47,17 @@ data.nome_reconst = nome_in;
 % data.vocoder(1);
 % % data.lambda = lc(il);
 % sim.corr_esp = 'Exp';
-data.NF = 20;
+data.NF = 10;
 % data.dtn_A = 35e-3;
 % data.N_neurons = 50;
 % data.neural_vocoder(1);
 data.calcOndas();
-figure(2)
-plot(data.tempo,data.ondas(:,:))
-xlabel('t(s)')
-ylabel('corrente (A)')
-xlim([0.498 0.5])
-ylim([-sim.max_corr sim.max_corr])
-%hold on
+% figure
+% plot(data.tempo,data.ondas(:,:))
+% xlabel('t(s)')
+% ylabel('corrente (A)')
+% %xlim([0.495 0.015])
+% ylim([-sim.max_corr sim.max_corr])
 %%
 % figure(1)
 % plot(sim.amp_corr_T,'-or')
