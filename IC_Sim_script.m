@@ -1,16 +1,20 @@
 %% Simulacao do sinal no implante coclear
-nome_in = {'seno_1k', 'seno_5k', 'chirp_125_125e2' , 'ruido_branco_16k', 'chão_16k'};    
-fc = [0.24 0.63 1];
-pc = [1:7 9];
+% nome_in = {'seno_1k', 'seno_5k', 'chirp_125_125e2' , 'ruido_branco_16k', 'chão_16k'};    
+% fc = [0.24 0.63 1];
+% pc = [1:7 9];
+
+nome_in = {'chão_16k'};    
+fc = 0.63;
+pc = 1;
 
 for i = 1:length(nome_in)
     for j = 1:length(fc)
         for k = 1:length(pc)
             
-%clear classes
-%clear all
-close all
-%clc
+% clear classes
+% clear all
+%close all
+clc
 addpath(genpath('./funcoes'))
 addpath(genpath('./SRMRToolbox-master'))
 addpath(genpath('./wideband'))
@@ -19,9 +23,9 @@ addpath(genpath('./dados_pacientes'))
 % fs = 16e3;
 % resamp_audio('fiz.wav','./monossilabas/fiz_16k.wav',fs)
 
-nome_in = {'seno_1k', 'seno_5k', 'chirp_125_125e2' , 'ruido_branco_16k', 'chão_16k'};    
-fc = [0.24 0.63 1];
-pc = [1:7 9];
+% nome_in = {'seno_1k', 'seno_5k', 'chirp_125_125e2' , 'ruido_branco_16k', 'chão_16k'};    
+% fc = [0.24 0.63 1];
+% pc = [1 3];
         
             
 %% Processador
@@ -40,15 +44,20 @@ tic
 sim.cis_ace();
 toc
 %%
-% figure(1)
-% %plot(sim.vet_tempo,sim.Csinal_processador.comp(20,:)')
-% xlim([0.3 0.4])
-% ylim([130 200])
-% %plot(sim.Csinal_processador.corr_onda.E22(:,2)')
-% hold on
-% xlabel('t(s)')
-% ylabel('UC(1-255)')
-% legend('1','0,6','0,2','Location','NorthWest')
+figure(1)
+%plot(sim.vet_tempo,sim.Csinal_processador.comp(10,:)','b')
+%text(0.925,185,'E2','Color','k')
+xlim([0.2 0.5])
+ylim([120 160])
+hold on
+%plot(sim.vet_tempo,sim.Csinal_processador.comp(10,:)','r')
+text(0.325,123,'0,63','Color','b')
+text(0.25,152,'0,24','Color','r')
+%plot(sim.vet_tempo,sim.Csinal_processador.comp(22,:)','r')
+%text(0.025,185,'E22','Color','k')
+xlabel('t(s)')
+ylabel('CL')
+%legend('0,24','0,63','Location','NorthWest')
 
 %% Reconstrução 
 
@@ -72,14 +81,21 @@ toc
 % %hold on
 %%
 % figure(1)
-% plot(sim.amp_corr_T,'-or')
-% xlabel('canal')
-% ylabel('UC (1-255)')
+% h2 = plot(sim.amp_corr_T,'-ob');
+% xlabel('Eletrodo')
+% ylabel('CL')
 % %ylim([100 250])
+% text(13,200,'C-Level p3','Color','b')
+% % text(13,187,'C-Level p1','Color','r')
+% text(6,147,'T-Level p3','Color','b')
+% % text(6,127,'T-Level p1','Color','r')
 % hold on
-% plot(sim.amp_corr_C,'-or')
-%legend('p1 (T-level)','p1 (C-level)','p3 (T-level)','p3 (C-level)','Location','NorthEast')
-
+% plot(sim.amp_corr_C,'-ob')
+% %legend(h2,'p3','Location','SouthEastOutside')
+% xlim([0 23])
+% set(gca,'XTick',[1:22])
+% set(gca,'Xdir','reverse')
+% grid on
 %% Reconstrução Neural-vocoder
 
 % close all
@@ -175,30 +191,31 @@ toc
 
 %% Eletrodograma
 
-canal_min = 1;
-canal_max = sim.num_canais;
-%figure
-for n = 1:canal_max
-h = subplot(canal_max-canal_min+1,1,n);
-vn = strcat('E',num2str(n));
-tc = sim.Csinal_processador.corr_onda.(vn);
-stem(tc(:,1),tc(:,2),'k','Marker','none');
-ylim([0 sim.max_corr])
-%ylim([0 1.25*abs(max(tc(:,2)))])
-%ylim([0 sim.max_corr_paciente(n)])
-set(h,'XTick',[])
-set(h,'YTick',[])
-set(h,'FontSize',8)
-ylabel(strcat('',num2str(n)))
-if n == canal_max
-    set(h,'XTick',0:0.05:max(sim.vet_tempo),'TickDir','out')
-    xlim([0 max(sim.vet_tempo)])
-    xlabel('t(s)')
-end
-suplabel('Número do eletrodo','y',[.125 .125 .8 .8]);
-end
-print(char(strcat('./resultados eletrodograma/EG_',nome_in(i),'_p',num2str(pc(k)),'_fc',num2str(j))),'-depsc')
-print(char(strcat('./resultados eletrodograma/EG_',nome_in(i),'_p',num2str(pc(k)),'_fc',num2str(j))),'-dpng')
+% canal_min = 1;
+% canal_max = sim.num_canais;
+% %figure
+% for n = 1:canal_max
+% h = subplot(canal_max-canal_min+1,1,n);
+% vn = strcat('E',num2str(n));
+% tc = sim.Csinal_processador.corr_onda.(vn);
+% stem(tc(:,1),tc(:,2),'k','Marker','none');
+% %ylim([0 sim.max_corr])
+% %ylim([0 1.25*abs(max(tc(:,2)))])
+% ylim([0 sim.max_corr_paciente(n)])
+% set(h,'XTick',[])
+% set(h,'YTick',[])
+% set(h,'FontSize',8)
+% set(h,'yscale','log')
+% ylabel(strcat('',num2str(n)))
+% if n == canal_max
+%     set(h,'XTick',0:0.05:max(sim.vet_tempo),'TickDir','out')
+%     xlim([0 max(sim.vet_tempo)])
+%     xlabel('t(s)')
+% end
+% suplabel('Número do eletrodo','y',[.125 .125 .8 .8]);
+% end
+% print(char(strcat('./plot resultados2/EG_',nome_in(i),'_p',num2str(pc(k)),'_fc',num2str(j))),'-depsc')
+% print(char(strcat('./plot resultados2/EG_',nome_in(i),'_p',num2str(pc(k)),'_fc',num2str(j))),'-dpng')
         end
     end
 end
@@ -213,11 +230,12 @@ end
 % %set(gca,'Yscale','log')
 % % set(gca,'XTick',[])
 % % set(gca,'YTick',[])
-% ylim([2e1 8e3])
+% xlim([0 0.1])
+% ylim([0 8e3])
 % colormap(jet);
 % view(0,90);
-% ylabel('Frequency (Hz) ');
-% xlabel('Time ');
+% ylabel('f(Hz)');
+% xlabel('t(s)');
 
 %% Espectrograma Wavelet
 % 
