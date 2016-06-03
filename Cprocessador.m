@@ -1,31 +1,19 @@
-classdef Cprocessador < handle
-    % Classe principal da simulacao do Implante Coclear
+classdef Cprocessador < Cpaciente 
+    % Classe responsável pelo processamento do Implante Coclear
     %   
     
-    properties (Access = public)
-        Csinal_processador % Classe com sinais para cada etapa do processador             
-        num_canais = 22 % Numero de canais do IC
-        maxima = 22 % Selecao de n (maxima) canais por frame
+    properties (Access = public)                
         tipo_filtro = 'Butterworth' % Tipo de filtro para o banco do IC
         tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
-        tipo_pulso = 'Bifasico' % Formato de pulso eletrico
-        largura_pulso1 = 25e-6 % Largura do pulso (meia onda 1 sem contar o interphase gap)
-        largura_pulso2 = 25e-6 % Largura do pulso (meia onda 2 sem contar o interphase gap)
-        interphase_gap = 8e-6 % Intervalo entre as partes positiva e negativa do pulso
         taxa_est = 1000 % Taxa de estimulacao do gerador de pulsos
         quant_bits = 8 % Número de bits para divisão da faixa dinamica
-        fat_comp = 0.6 % fator de compressao (expoente para a lei da potencia)
         fase_pulso = 'Catodico' % Fase inicial do pulso: Anodico (+) ou Catodico (-)
-        amp_corr_T  % Limiar da amplitude de corrente por banda
-        amp_corr_C % Maximo conforto para amplitude de corrente por banda
-        max_corr = 1.75e-3 % Maxima corrente do gerador
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome % Nome do arquivo de entrada de audio
- 
     end
     
     properties (Dependent)
@@ -38,26 +26,27 @@ classdef Cprocessador < handle
     end
     
     methods % Funcoes da Classe
-        function objeto = Cprocessador(prop1,prop2) % Funcao geral da Classe
-            if nargin == 1
-                objeto.nome = prop1;
-            elseif nargin == 2
-                objeto.nome = prop1;
-                objeto.paciente = prop2;
-            
+        function objeto = Cprocessador(arquivo_dat,prop2) % Funcao geral da Classe           
+            objeto@Cpaciente(arquivo_dat); 
+            if nargin == 2
+                objeto.nome = prop2;
+            else 
+                error('Wrong number of input arguments')
+                
+             
 %                 if strcmp(objeto.paciente,'media') == 1
 %                     Cpaciente(objeto.paciente).media_paciente()
 %                 end
-                
-            objeto.num_canais = max(Cpaciente(objeto.paciente).num_canais);
-            objeto.maxima = Cpaciente(objeto.paciente).maxima;
-            objeto.interphase_gap = mean(Cpaciente(objeto.paciente).interphase_gap)*1e-6;
-            objeto.largura_pulso1 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
-            objeto.largura_pulso2 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
-            objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
-            objeto.amp_corr_T = Cpaciente(objeto.paciente).amp_corr_T(1:objeto.num_canais);
-            objeto.amp_corr_C = Cpaciente(objeto.paciente).amp_corr_C(1:objeto.num_canais);
-            objeto.baixa_freq = Cpaciente(objeto.paciente).inf_freq(1,1);
+%                 
+%             objeto.num_canais = max(Cpaciente(objeto.paciente).num_canais);
+%             objeto.maxima = Cpaciente(objeto.paciente).maxima;
+%             objeto.interphase_gap = mean(Cpaciente(objeto.paciente).interphase_gap)*1e-6;
+%             objeto.largura_pulso1 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
+%             objeto.largura_pulso2 = mean(Cpaciente(objeto.paciente).largura_pulso)*1e-6;
+%             objeto.fat_comp = mean(Cpaciente(objeto.paciente).fat_comp);
+%             objeto.amp_corr_T = Cpaciente(objeto.paciente).amp_corr_T(1:objeto.num_canais);
+%             objeto.amp_corr_C = Cpaciente(objeto.paciente).amp_corr_C(1:objeto.num_canais);
+%             objeto.baixa_freq = Cpaciente(objeto.paciente).inf_freq(1,1);
                                               
             end
         end 
@@ -108,7 +97,7 @@ classdef Cprocessador < handle
 
         function filtros(objeto)
             %objeto.Csinal_processador.filt = cochlearFilterBank(objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in);
-            objeto.Csinal_processador.filt = CIFilterBank(objeto.freq_amost, objeto.num_canais,Cpaciente(objeto.paciente).central_freq(1), objeto.Csinal_processador.in,Cpaciente(objeto.paciente).bandas_freq_entrada(1:objeto.num_canais));
+            objeto.Csinal_processador.filt = CIFilterBank(objeto.freq_amost, objeto.num_canais,objeto.central_freq(1), objeto.Csinal_processador.in,objeto.bandas_freq_entrada(1:objeto.num_canais));
         end 
     
         function ext_env(objeto)

@@ -6,18 +6,19 @@ function  intel  = srmr2intel( SRMR, SRMR_clean, flgci )
 %   flgci is a flag, if 0: srmr metric for normal hearing;
 %                    if 1: srmr_ci
 
-srmr_norm = SRMR/SRMR_clean;
+srmr_norm = SRMR./SRMR_clean;
 switch flgci
-    case 0      %SRMR
-        alpha = [-2.8516, 6.7629]';
-        
+    case 0      %SRMR_norm
+        alpha = [-4.2384, 11.4121]';
+        intel=95.4./(1+exp(-(alpha(1)+alpha(2).*srmr_norm)));
     case 1      %SRMR-CI
         alpha = [-7.4535, 12.1742]';
+        intel=88.92./(1+exp(-(alpha(1)+alpha(2).*srmr_norm)));
 
     otherwise
         error('flgci must be either 0 or 1. See help' )
 end
 
-intel=88.92./(1+exp(-(alpha(1)+alpha(2)*srmr_norm)));
+
 end
 

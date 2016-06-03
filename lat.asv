@@ -1,9 +1,0 @@
-function LAT = lat(p,mu,sigma)
-a1 = 106e-6;
-a2 = 5.14e-6;
-a3 = 368e-6;
-a4 = 472e-6;
-
-LAT = (a3./(1+exp((1/a2).*(mu+sigma*norminv(p,mu,sigma)-a1)))) + a4;
-
-end

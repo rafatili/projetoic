@@ -1,4 +1,4 @@
-classdef Csinal_in
+classdef Csinal_in < handle
     %Csinal_in: Classe que contem as caracteristicas do sinal de audio
     %   
     

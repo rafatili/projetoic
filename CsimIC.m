@@ -1,4 +1,4 @@
-classdef Creconst < Cpaciente
+classdef CsimIC < CmodeloNA
     %CRECONST Classe de objetoetos que armazenam os dados, testa modelos e
     %reconstroi o sinal
     
@@ -6,89 +6,47 @@ classdef Creconst < Cpaciente
         Csinal_processador % Classe com sinais para cada etapa do processador
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         max_corr = 1.75e-3 % Maxima corrente do gerador
-        NF = 15;        % Discretização da nova freq amost
         nome_reconst
-        CorrDist        % Distribuição de corrente
-        Spike_matrix    % Matriz de spikes
-        V_mem           % Potencial de membrana ao longo do tempo
-        Ap              % Somatório de spikes ao longo do tempo
-        lambda = 3;     % Monopolar 8-11mm / Bipolar 2-4mm
-        dtn_A = 35e-3;  % Discretização para o somatório de spikes
-        N_neurons = 1000; % numero total de neuronios
-        R_mem = [1900e6 2000e6]; % resistencia do neuronio [Ohms] | Distribuicao normal entre 1900MOhm e 2000MOhm como 99.7% do intervalo de confianca
-        C_mem = [0.07e-12 0.5e-12]; % capacitancia [F] | Distribuicao normal entre 0.07pF e 0.5pF como 99.7% do intervalo de confianca
-        dt_refrat_abs = [1e-6 330e-6]; % % periodo refratario absoluto [s] | Distribuicao normal entre 1us e 300us
-        V_thr_mem = [-50e-3 -36e-3]; % potencial limiar [V] | Distribuicao normal entre -50mV e -36mV
-        V_rest_mem = [-80e-3 -55e-3]; % potencial de membrana estacionario [V] | Distribuicao normal entre -80mV e -55mV
-        V_ruido_mem = [-2e-3 2e-3];       % potencial de ruido [V] | Distribuicao normal entre -2mV e 2mV
-        corr_esp = 'Gauss'; % 'Exp' ou 'Gauss'
-        pos_inicial = 0; % posição inicial do arrranjo de eletrodos inserido na cóclea [mm]
-        dx_eletrodo = 1; % distância entre eletrodos [mm]
-        R_canal = 5e3; % impedância dos canais do implante [Ohm]
         audio_reconst
         carrier = 'Harmonic Complex'; % carrier do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
-        ondas
-        tempo
+        tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
     end
     properties(Dependent)
         freq2;          % Frequencia de amostragem das ondas de corrente
     end
     
     methods
-        function objeto = Creconst(arquivo_dat)      %construtor
-            objeto@Cpaciente(arquivo_dat);           
+        function objeto = CsimIC(arquivo_dat,nome) % Funcao geral da Classe           
+            objeto@CmodeloNA(arquivo_dat,nome);
         end
         
         function f2 = get.freq2(objeto)
             f2 = objeto.NF*objeto.freq_amost;
         end
-        
-        function calcOndas(objeto)
-            tmax = zeros(1,objeto.num_canais);
-            for n = 1:objeto.num_canais
-                vn = strcat('E',num2str(n));
-                tc = objeto.Csinal_processador.corr_onda.(vn);
-                tmax(n) = max(tc(:,1));
-            end
-
-            tend = max(tmax) + objeto.largura_pulso1 + objeto.interphase_gap + objeto.largura_pulso2;
-            npoints = ceil(tend*objeto.freq2);
-            objeto.tempo = (1:npoints)*1/objeto.freq2;
-            objeto.ondas = zeros(objeto.num_canais,npoints);
-
-            for n = 1:objeto.num_canais
-                vn = strcat('E',num2str(n));
-                tc = objeto.Csinal_processador.corr_onda.(vn);
-                [~,objeto.ondas(n,:)] = calcOndas(tc, objeto.freq2, objeto.tipo_pulso, ...
-                objeto.largura_pulso1, objeto.largura_pulso2, objeto.tempo);                
-            end
-        end
+           
         
         function vocoder(objeto,flag)
-            saida = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,...
+            switch(objeto.tipo_vocoder)
+                
+                case 'Normal'
+                objeto.audio_reconst = vocoder(objeto.Csinal_processador.env,objeto.freq_amost,...
                 objeto.carrier,Cpaciente(objeto.paciente).bandas_freq_entrada,...
                 Cpaciente(objeto.paciente).sup_freq,Cpaciente(objeto.paciente).inf_freq,...
                 objeto.vet_tempo);
-            if flag == 1
-            nv = '_vocoder_hc.wav';
-            audiowrite(char(strcat(objeto.nome_reconst,nv)),saida,objeto.freq_amost)
+                    if flag == 1
+                        nv = '_vocoder_hc.wav';
+                        audiowrite(char(strcat(objeto.nome_reconst,nv)),saida,objeto.freq_amost)
+                    end
+                    
+                case 'Neural'
+                    objeto.audio_reconst = neural_vocoder(objeto.Ap,objeto.freq_amost,objeto.carrier,objeto.dtn_A,objeto.pos_eletrodo);
+                    if flag == 1
+                        nv = strcat('_neural_vocoder_hc','.wav');
+                        audiowrite(char(strcat(objeto.nome_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
+                    end
             end
         end
         
-        function neural_vocoder(objeto,flag)
-            objeto.calcOndas();
-            [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap,...
-                objeto.audio_reconst] = neural_vocoder(objeto.ondas,objeto.num_canais,...
-                objeto.freq_amost,objeto.freq2,objeto.corr_esp,objeto.carrier,...
-                objeto.lambda,objeto.dtn_A, objeto.N_neurons, objeto.R_mem,objeto.C_mem,...
-                objeto.dt_refrat_abs,objeto.V_thr_mem,objeto.V_rest_mem,objeto.V_ruido_mem,...
-                objeto.pos_inicial, objeto.dx_eletrodo, objeto.R_canal);
-
-            if flag == 1
-            nv = strcat('_neural_vocoder_hc','.wav');
-            audiowrite(char(strcat(objeto.nome_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
-            end
-        end 
         
         function plotSpikes(objeto)
             [y,x] = find(objeto.Spike_matrix);

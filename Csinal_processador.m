@@ -1,4 +1,4 @@
-classdef Csinal_processador
+classdef Csinal_processador < handle
     % Classe das etapas do processamento
     
     properties

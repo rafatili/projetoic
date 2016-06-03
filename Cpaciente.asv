@@ -61,7 +61,7 @@ classdef Cpaciente < handle
             if strcmp(objeto.arquivo_dat,'media') == 1
             val = objeto.paciente_cochlear_media_vetor(1);
             else
-            val = max(dlmread(objeto.arquivo_dat,'\t',[15 0 36 0]));
+            val = dlmread(objeto.arquivo_dat,'\t',[15 0 36 0]);
             end
         end
         
@@ -109,7 +109,7 @@ classdef Cpaciente < handle
             if strcmp(objeto.arquivo_dat,'media') == 1
             val = mean(objeto.paciente_cochlear_media_matriz(:,7));
             else
-            val = mean(dlmread(objeto.arquivo_dat,'\t',[15 7 36 7]))*1e-6;
+            val = dlmread(objeto.arquivo_dat,'\t',[15 7 36 7]).*e-6;
             end
         end
         
@@ -117,7 +117,7 @@ classdef Cpaciente < handle
             if strcmp(objeto.arquivo_dat,'media') == 1
             val = mean(objeto.paciente_cochlear_media_matriz(:,7));
             else
-            val = mean(dlmread(objeto.arquivo_dat,'\t',[15 7 36 7]))*1e-6;
+            val = dlmread(objeto.arquivo_dat,'\t',[15 7 36 7]).*e-6;
             end
         end
         
@@ -133,7 +133,7 @@ classdef Cpaciente < handle
             if strcmp(objeto.arquivo_dat,'media') == 1
             val = objeto.paciente_cochlear_media_vetor(3);
             else
-            val = mean(dlmread(objeto.arquivo_dat,'\t',[4 1 4 1]))*1e-6;
+            val = dlmread(objeto.arquivo_dat,'\t',[4 1 4 1]);
             end
         end
         
