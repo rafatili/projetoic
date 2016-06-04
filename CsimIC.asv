@@ -7,7 +7,6 @@ classdef CsimIC < CmodeloNA
         audio_reconst % Sinal de audio reconstruido
         carrier = 'Harmonic Complex'; % carrier do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
         tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
-        tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
         SRMR_NH % Valor da metrica SRMR-NH
         SRMR_IC % Valor da metrica SRMR-CI
         Intel_SRMR_NH % Previsao da inteligibilidade para a metrica SRMR-NH
@@ -79,8 +78,8 @@ classdef CsimIC < CmodeloNA
             
         end
         
-        function plotEspectrograma(objeto)
-            switch objeto.tipo_espec               
+        function plotEspectrograma(objeto,tipoEspec)
+            switch tipoEspec               
                 case 'Wavelet'
                     figure()
                     level = 6;
@@ -97,11 +96,10 @@ classdef CsimIC < CmodeloNA
                     
                 case 'FFT'                    
                     figure();        
-                    [p,f,t] = spectrogram(objeto.Csinal_processador.in,256,120,256,objeto.freq_amost,'yaxis');
+                    [p,f,t] = spectrogram(objeto.Csinal_processador.in,256,120,128,objeto.freq_amost,'yaxis');
                     surf(t,f,10*log10(abs(p)),'EdgeColor','none');
                     axis xy; 
                     axis tight;
-                    set(gca,'yscale','log');
                     xlim([0 0.1])
                     ylim([0 8e3])
                     colormap(jet);

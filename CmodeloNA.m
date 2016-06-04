@@ -1,5 +1,5 @@
 classdef CmodeloNA < Cprocessador
-    %CmodeloNA esta classe contém modelos do Nervo Auditivo
+    %CmodeloNA Classe responsável pela modelagem da resposta do Nervo Auditivo
     
     properties
         NF = 10;        % Discretização da nova freq amost
@@ -18,12 +18,16 @@ classdef CmodeloNA < Cprocessador
         V_ruido_mem = [-2e-3 2e-3];       % potencial de ruido [V] | Distribuicao normal entre -2mV e 2mV
         corr_esp = 'Gauss'; % 'Exp' ou 'Gauss'
         pos_inicial = 0; % posição inicial do arrranjo de eletrodos inserido na cóclea [mm]
-        pos_eletrodo
+        pos_eletrodo % Vetor de posicao de cada eletrodo no arranjo
         dx_eletrodo = 1; % distância entre eletrodos [mm]
         R_canal = 5e3; % impedância dos canais do implante [Ohm]
-        ondas
-        tempo
+        ondas % Series de pulsos de corrente
+        tempo % vetor temporal para series de pulso
         
+    end
+    
+    properties(Dependent)
+        freq2;          % Frequencia de amostragem das ondas de corrente
     end
     
     methods
@@ -31,6 +35,9 @@ classdef CmodeloNA < Cprocessador
             objeto@Cprocessador(arquivo_dat,nome);
         end
         
+        function f2 = get.freq2(objeto)
+            f2 = objeto.NF*objeto.freq_amost;
+        end
         function calcOndas(objeto)
             tmax = zeros(1,objeto.num_canais);
             for n = 1:objeto.num_canais
@@ -55,10 +62,10 @@ classdef CmodeloNA < Cprocessador
         function LIF(objeto)
             objeto.calcOndas();
             [objeto.CorrDist,objeto.Spike_matrix, objeto.V_mem, objeto.Ap, objeto.pos_eletrodo] = LIF(objeto.ondas,objeto.num_canais,...
-                objeto.freq2,objeto.corr_esp,...
-                objeto.lambda,objeto.dtn_A, objeto.N_neurons, objeto.R_mem,objeto.C_mem,...
-                objeto.dt_refrat_abs,objeto.V_thr_mem,objeto.V_rest_mem,objeto.V_ruido_mem,...
-                objeto.pos_inicial, objeto.dx_eletrodo, objeto.R_canal);
+            objeto.freq2,objeto.corr_esp,...
+            objeto.lambda,objeto.dtn_A, objeto.N_neurons, objeto.R_mem,objeto.C_mem,...
+            objeto.dt_refrat_abs,objeto.V_thr_mem,objeto.V_rest_mem,objeto.V_ruido_mem,...
+            objeto.pos_inicial, objeto.dx_eletrodo, objeto.R_canal);    
         end 
     end
     
