@@ -7,7 +7,7 @@ classdef Csinal_processador < handle
         filt
         env
         comp
-        corr_onda
+        amp_pulsos
     end
     
     methods

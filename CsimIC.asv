@@ -61,7 +61,7 @@ classdef CsimIC < CmodeloNA
             for n = 1:canal_max
                 h = subplot(objeto.num_canais-canal_min+1,1,n);
                 vn = strcat('E',num2str(n));
-                tc = objeto.Csinal_processador.amp_pulsos.(vn);
+                tc = objeto.Csinal_processador.corr_onda.(vn);
                 stem(tc(:,1),tc(:,2),'k','Marker','none');
                 ylim([0 objeto.max_corr])
                 set(h,'XTick',[])
