@@ -1,11 +1,11 @@
 classdef CsimIC < CmodeloNA
-    %CRECONST Classe de objetoetos que armazenam os dados, testa modelos e
-    %reconstroi o sinal
+    %CsimIC Classe para criação do objeto de simulação, reconstruçao do
+    %sinal e avaliaçao objetiva dos resultados
     
     properties
-        nome_reconst % nome do arquivo gerado para o sinal reconstruido
+        nome_sinal_reconst % nome do arquivo gerado para o sinal reconstruido
         audio_reconst % Sinal de audio reconstruido
-        carrier = 'Harmonic Complex'; % carrier do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
+        carrier = 'Harmonic Complex'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
         tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
         tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
         SRMR_NH % Valor da metrica SRMR-NH
@@ -16,8 +16,8 @@ classdef CsimIC < CmodeloNA
 
     
     methods
-        function objeto = CsimIC(arquivo_dat,nome) % Funcao geral da Classe           
-            objeto@CmodeloNA(arquivo_dat,nome);
+        function objeto = CsimIC(arquivo_dat,nome_sinal_entrada) % Funcao geral da Classe           
+            objeto@CmodeloNA(arquivo_dat,nome_sinal_entrada);
         end
        
         function vocoder(objeto,flag)
@@ -30,22 +30,22 @@ classdef CsimIC < CmodeloNA
                 objeto.vet_tempo);
                     if flag == 1
                         nv = '_vocoder_hc.wav';
-                        audiowrite(char(strcat(objeto.nome_reconst,nv)),saida,objeto.freq_amost)
+                        audiowrite(char(strcat(objeto.nome_sinal_reconst,nv)),saida,objeto.freq_amost)
                     end
                     
                 case 'Neural'
                     objeto.audio_reconst = neural_vocoder(objeto.Ap,objeto.freq_amost,objeto.carrier,objeto.dtn_A,objeto.pos_eletrodo);
                     if flag == 1
                         nv = strcat('_neural_vocoder_hc','.wav');
-                        audiowrite(char(strcat(objeto.nome_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
+                        audiowrite(char(strcat(objeto.nome_sinal_reconst,nv)),objeto.audio_reconst,objeto.freq_amost)
                     end
             end
         end
         
         
         function plotSpikes(objeto)
-            [y,x] = find(objeto.Spike_matrix);
-            x = x/(2*objeto.freq2);
+            [y,x] = find(objeto.spike_matrix);
+            x = x/(2*objeto.freq_amost_pulsos);
             figure()
             plot(x,y,'.k','MarkerSize',2)
             ylim([0 max(y)])
@@ -61,7 +61,7 @@ classdef CsimIC < CmodeloNA
             for n = 1:canal_max
                 h = subplot(objeto.num_canais-canal_min+1,1,n);
                 vn = strcat('E',num2str(n));
-                tc = objeto.Csinal_processador.corr_onda.(vn);
+                tc = objeto.Csinal_processador.amp_pulsos.(vn);
                 stem(tc(:,1),tc(:,2),'k','Marker','none');
                 ylim([0 objeto.max_corr])
                 set(h,'XTick',[])

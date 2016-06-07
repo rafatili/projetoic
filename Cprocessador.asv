@@ -3,8 +3,8 @@ classdef Cprocessador < Cpaciente
     %   
     
     properties (Access = public)   
-        Csinal_processador
-        tipo_filtro = 'Gammatone' % Tipo de filtro para o banco do IC: 'Gammatone' ; 'Nucleus'
+        Csinal_processador % Classe com sinais de cada bloco de processamento
+        tipo_filtro = 'Gammatone' % Tipo de filtro para o banco do IC: 'Gammatone' ; 'Nucleus';
         tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
@@ -15,6 +15,8 @@ classdef Cprocessador < Cpaciente
         paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome % Nome do arquivo de entrada de audio
+        tipo_pulso = 'Bifasico' % Formato de pulso eletrico
+        max_corr = 1.75e-3 % Maxima corrente do gerador
     end
     
     properties (Dependent)
@@ -22,12 +24,12 @@ classdef Cprocessador < Cpaciente
         T_total % Tempo total do arquivo de entrada      
         num_bits % Número de bits do arquivo de entrada 
         vet_tempo % Vetor temporal do arquivo de entrada
-        freq_amost
-        max_corr_paciente
+        freq_amost % Frequencia de amostragem
+        max_corr_paciente % Corrente maxima suportada pelo paciente
     end
     
     methods % Funcoes da Classe
-        function objeto = Cprocessador(arquivo_dat,prop2) % Funcao geral da Classe           
+        function objeto = Cprocessador(arquivo_dat,prop2)           
             objeto@Cpaciente(arquivo_dat); 
             if nargin == 2
                 objeto.nome = prop2;
@@ -62,7 +64,7 @@ classdef Cprocessador < Cpaciente
         end
         
         function max_corr_paciente = get.max_corr_paciente(objeto)
-                max_corr_paciente = objeto.max_corr*(1e-2)*10.^(objeto.amp_corr_C/(2^objeto.num_bits-1));
+                max_corr_paciente = objeto.max_corr*(1e-2)*10.^(objeto.C_Level/(2^objeto.num_bits-1));
         end
         
 %% OUTRAS FUNÇÕES
@@ -81,23 +83,34 @@ classdef Cprocessador < Cpaciente
 %% BLOCOS
 
         function filtros(objeto)
-            %objeto.Csinal_processador.filt = cochlearFilterBank(objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in);
-            objeto.Csinal_processador.filt = CIFilterBank(objeto.freq_amost, objeto.num_canais,objeto.central_freq(1), objeto.Csinal_processador.in,objeto.bandas_freq_entrada(1:objeto.num_canais));
+            switch(objeto.tipo_filtro)
+                
+                case 'Gammatone'
+                objeto.Csinal_processador.filt = cochlearFilterBank(...
+                    objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in);
+                
+                case 'Nucleus'
+                objeto.Csinal_processador.filt = CIFilterBank(...
+                    objeto.freq_amost, objeto.num_canais,objeto.central_freq(1),...
+                    objeto.Csinal_processador.in,objeto.bandas_freq_entrada(1:objeto.num_canais));
+            end
         end 
     
         function ext_env(objeto)
-            objeto.Csinal_processador.env = ext_env(objeto.Csinal_processador.filt,objeto.tipo_env,objeto.fcorte_fpb,objeto.freq_amost,objeto.ordem_fpb);
+            objeto.Csinal_processador.env = ext_env(objeto.Csinal_processador.filt,...
+                objeto.tipo_env,objeto.fcorte_fpb,objeto.freq_amost,objeto.ordem_fpb);
         end
         
         function comp(objeto)
-            objeto.Csinal_processador.comp = comp(objeto.Csinal_processador.env,objeto.fat_comp,objeto.amp_corr_C,objeto.amp_corr_T);         
+            objeto.Csinal_processador.comp = comp(objeto.Csinal_processador.env,...
+                objeto.fat_comp,objeto.C_Level,objeto.T_Level);         
         end
        
         function ger_pulsos(objeto)          
             objeto.Csinal_processador.corr_onda = ger_pulsos(objeto.Csinal_processador.comp,objeto.num_canais,...
                 objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso1,...
                 objeto.largura_pulso2,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso,objeto.max_corr,...
-                objeto.quant_bits,objeto.amp_corr_T,objeto.amp_corr_C);                   
+                objeto.quant_bits,objeto.T_Level,objeto.C_Level);                   
         end
                                                   
         function cis_ace(objeto)

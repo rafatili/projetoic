@@ -1,10 +1,10 @@
-classdef Cprocessador < Cpaciente 
+classdef Cprocessador < Cpaciente & CsinalEntrada
     % Classe responsável pelo processamento do Implante Coclear
     %   
     
-    properties (Access = public)   
+    properties 
         Csinal_processador % Classe com sinais de cada bloco de processamento
-        tipo_filtro = 'Gammatone' % Tipo de filtro para o banco do IC: 'Gammatone' ; 'Nucleus';
+        tipo_filtro = 'Nucleus' % Tipo de filtro para o banco do IC: 'Gammatone' ; 'Nucleus';
         tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
@@ -14,7 +14,7 @@ classdef Cprocessador < Cpaciente
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
-        nome % Nome do arquivo de entrada de audio
+        nome_sinal_entrada % nome do arquivo de entrada de audio
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         max_corr = 1.75e-3 % Maxima corrente do gerador
     end
@@ -29,10 +29,11 @@ classdef Cprocessador < Cpaciente
     end
     
     methods % Funcoes da Classe
-        function objeto = Cprocessador(arquivo_dat,prop2) % Funcao geral da Classe           
-            objeto@Cpaciente(arquivo_dat); 
+        function objeto = Cprocessador(arquivo_dat,prop2)           
+            objeto@Cpaciente(arquivo_dat);
+            objeto@CsinalEntrada(); 
             if nargin == 2
-                objeto.nome = prop2;
+                objeto.nome_sinal_entrada = prop2;
             else 
                 error('Wrong number of input arguments')                                     
             end
@@ -40,39 +41,38 @@ classdef Cprocessador < Cpaciente
         
 %% GET (Definição das variáveis dependentes)      
         
-        function freq_amost = get.freq_amost(objeto)
-            [~ , var]= audioread(objeto.nome);
-            freq_amost = var;
+        function val = get.freq_amost(objeto)
+            [~ , val]= audioread(objeto.nome_sinal_entrada);
         end       
         
-        function dt = get.dt(objeto)
-                dt = 1/objeto.freq_amost;
+        function val = get.dt(objeto)
+                val = 1/objeto.freq_amost;
         end
         
-        function T_total = get.T_total(objeto)
-                var = audioinfo(objeto.nome);
-                T_total = var.Duration;
+        function val = get.T_total(objeto)
+                var = audioinfo(objeto.nome_sinal_entrada);
+                val = var.Duration;
         end
         
-        function vet_tempo = get.vet_tempo(objeto)
-                vet_tempo = objeto.dt:objeto.dt:objeto.T_total;
+        function val = get.vet_tempo(objeto)
+                val = objeto.dt:objeto.dt:objeto.T_total;
         end      
         
-        function num_bits = get.num_bits(objeto)
-                var = audioinfo(objeto.nome);
-                num_bits = var.BitsPerSample;
+        function val = get.num_bits(objeto)
+                var = audioinfo(objeto.nome_sinal_entrada);
+                val = var.BitsPerSample;
         end
         
-        function max_corr_paciente = get.max_corr_paciente(objeto)
-                max_corr_paciente = objeto.max_corr*(1e-2)*10.^(objeto.C_Level/(2^objeto.num_bits-1));
+        function val = get.max_corr_paciente(objeto)
+                val = objeto.max_corr*(1e-2)*10.^(objeto.C_Level/(2^objeto.num_bits-1));
         end
         
 %% OUTRAS FUNÇÕES
 
         function openwav(objeto)
-%             [var1, var2] = audioread(objeto.nome);
+%             [var1, var2] = audioread(objeto.nome_sinal_entrada);
 %             objeto.Csinal_processador.in = resample(var1,objeto.freq_amost,var2);
-            objeto.Csinal_processador.in = audioread(objeto.nome);
+            objeto.Csinal_processador.in = audioread(objeto.nome_sinal_entrada);
         end
 
         function play(objeto)
@@ -107,7 +107,7 @@ classdef Cprocessador < Cpaciente
         end
        
         function ger_pulsos(objeto)          
-            objeto.Csinal_processador.corr_onda = ger_pulsos(objeto.Csinal_processador.comp,objeto.num_canais,...
+            objeto.Csinal_processador.amp_pulsos = ger_pulsos(objeto.Csinal_processador.comp,objeto.num_canais,...
                 objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso1,...
                 objeto.largura_pulso2,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso,objeto.max_corr,...
                 objeto.quant_bits,objeto.T_Level,objeto.C_Level);                   
