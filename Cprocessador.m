@@ -1,5 +1,5 @@
 classdef Cprocessador < Cpaciente & CsinalEntrada
-    % Classe responsável pelo processamento do Implante Coclear
+    %% Classe responsavel pelo processamento do IC
     %   
     
     properties 
@@ -9,10 +9,10 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
         taxa_est = 1000 % Taxa de estimulacao do gerador de pulsos
-        quant_bits = 8 % Número de bits para divisão da faixa dinamica
-        fase_pulso = 'Catodico' % Fase inicial do pulso: Anodico (+) ou Catodico (-)
+        quant_bits = 8 % Numero de bits para divisao da faixa dinamica
+        fase_pulso = 'Catodico' % Fase inicial do pulso (meia onda 1): 'Anodico' (+) ou 'Catodico' (-)
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
-        paciente = 'padrao' % Utilização das informacoes do 'paciente padrao' da clase
+        paciente = 'padrao' % Utilizacao das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
         nome_sinal_entrada % nome do arquivo de entrada de audio
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
@@ -22,103 +22,107 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
     properties (Dependent)
         dt % Intervalo de tempo entre pontos no arquivo de entrada
         T_total % Tempo total do arquivo de entrada      
-        num_bits % Número de bits do arquivo de entrada 
+        num_bits % Numero de bits do arquivo de entrada 
         vet_tempo % Vetor temporal do arquivo de entrada
         freq_amost % Frequencia de amostragem
         max_corr_paciente % Corrente maxima suportada pelo paciente
     end
     
     methods % Funcoes da Classe
-        function objeto = Cprocessador(arquivo_dat,prop2)           
-            objeto@Cpaciente(arquivo_dat);
-            objeto@CsinalEntrada(); 
+        function obj = Cprocessador(arquivo_dat,prop2)           
+            obj@Cpaciente(arquivo_dat);
+            obj@CsinalEntrada(); 
             if nargin == 2
-                objeto.nome_sinal_entrada = prop2;
+                obj.nome_sinal_entrada = prop2;
             else 
                 error('Wrong number of input arguments')                                     
             end
         end 
         
-%% GET (Definição das variáveis dependentes)      
+%% GET (Definicao das variaveis dependentes)      
         
-        function val = get.freq_amost(objeto)
-            [~ , val]= audioread(objeto.nome_sinal_entrada);
+        function val = get.freq_amost(obj)
+            [~ , val]= audioread(obj.nome_sinal_entrada);
         end       
         
-        function val = get.dt(objeto)
-                val = 1/objeto.freq_amost;
+        function val = get.dt(obj)
+                val = 1/obj.freq_amost;
         end
         
-        function val = get.T_total(objeto)
-                var = audioinfo(objeto.nome_sinal_entrada);
+        function val = get.T_total(obj)
+                var = audioinfo(obj.nome_sinal_entrada);
                 val = var.Duration;
         end
         
-        function val = get.vet_tempo(objeto)
-                val = objeto.dt:objeto.dt:objeto.T_total;
+        function val = get.vet_tempo(obj)
+                val = obj.dt:obj.dt:obj.T_total;
         end      
         
-        function val = get.num_bits(objeto)
-                var = audioinfo(objeto.nome_sinal_entrada);
+        function val = get.num_bits(obj)
+                var = audioinfo(obj.nome_sinal_entrada);
                 val = var.BitsPerSample;
         end
         
-        function val = get.max_corr_paciente(objeto)
-                val = objeto.max_corr*(1e-2)*10.^(objeto.C_Level/(2^objeto.num_bits-1));
+        function val = get.max_corr_paciente(obj)
+                val = obj.max_corr*(1e-2)*10.^(obj.C_Level/(2^obj.num_bits-1));
         end
         
-%% OUTRAS FUNÇÕES
+%% OUTRAS FUNCOES
 
-        function openwav(objeto)
-%             [var1, var2] = audioread(objeto.nome_sinal_entrada);
-%             objeto.Csinal_processador.in = resample(var1,objeto.freq_amost,var2);
-            objeto.Csinal_processador.in = audioread(objeto.nome_sinal_entrada);
+        function openwav(obj) % Importa um sinal .wav como entrada
+%             [var1, var2] = audioread(obj.nome_sinal_entrada);
+%             obj.Csinal_processador.in = resample(var1,obj.freq_amost,var2);
+            obj.Csinal_processador.in = audioread(obj.nome_sinal_entrada);
         end
 
-        function play(objeto)
-            sound(objeto.Csinal_processador.in,objeto.freq_amost)          
+        function play(obj) % Reproducao do sinal de entrada
+            sound(obj.Csinal_processador.in,obj.freq_amost)          
         end
         
         
 %% BLOCOS
 
-        function filtros(objeto)
-            switch(objeto.tipo_filtro)
+        function filtros(obj) % Banco de filtros do IC
+            switch(obj.tipo_filtro)
                 
                 case 'Gammatone'
-                objeto.Csinal_processador.filt = cochlearFilterBank(...
-                    objeto.freq_amost, objeto.num_canais, objeto.baixa_freq, objeto.Csinal_processador.in);
+                obj.Csinal_processador.filt = cochlearFilterBank(...
+                    obj.freq_amost, obj.num_canais, obj.baixa_freq, obj.Csinal_processador.in);
                 
                 case 'Nucleus'
-                objeto.Csinal_processador.filt = CIFilterBank(...
-                    objeto.freq_amost, objeto.num_canais,objeto.central_freq(1),...
-                    objeto.Csinal_processador.in,objeto.bandas_freq_entrada(1:objeto.num_canais));
+                    if obj.num_canais ~= 22
+                        error('O banco de filtros do Nucleus Freedom funciona apenas para 22 canais!')
+                    else
+                    obj.Csinal_processador.filt = CIFilterBank(...
+                        obj.freq_amost, obj.num_canais,obj.central_freq(1),...
+                        obj.Csinal_processador.in);
+                    end
             end
         end 
     
-        function ext_env(objeto)
-            objeto.Csinal_processador.env = ext_env(objeto.Csinal_processador.filt,...
-                objeto.tipo_env,objeto.fcorte_fpb,objeto.freq_amost,objeto.ordem_fpb);
+        function ext_env(obj) % Extracao da envoltoria dos canais
+            obj.Csinal_processador.env = ext_env(obj.Csinal_processador.filt,...
+                obj.tipo_env,obj.fcorte_fpb,obj.freq_amost,obj.ordem_fpb);
         end
         
-        function comp(objeto)
-            objeto.Csinal_processador.comp = comp(objeto.Csinal_processador.env,...
-                objeto.fat_comp,objeto.C_Level,objeto.T_Level);         
+        function comp(obj) % Compressao das envoltorias de acordo com o mapeamento
+            obj.Csinal_processador.comp = comp(obj.Csinal_processador.env,...
+                obj.fat_comp,obj.C_Level,obj.T_Level);         
         end
        
-        function ger_pulsos(objeto)          
-            objeto.Csinal_processador.amp_pulsos = ger_pulsos(objeto.Csinal_processador.comp,objeto.num_canais,...
-                objeto.maxima,objeto.freq_amost,objeto.T_total,objeto.taxa_est,objeto.tipo_pulso,objeto.largura_pulso1,...
-                objeto.largura_pulso2,objeto.interphase_gap,objeto.fase_pulso,objeto.atraso,objeto.max_corr,...
-                objeto.quant_bits,objeto.T_Level,objeto.C_Level);                   
+        function ger_pulsos(obj) % Geracao dos pulsos para CIS ou ACE (amplitude e instante no tempo)       
+            obj.Csinal_processador.amp_pulsos = ger_pulsos(obj.Csinal_processador.comp,obj.num_canais,...
+                obj.maxima,obj.freq_amost,obj.T_total,obj.taxa_est,obj.tipo_pulso,obj.largura_pulso1,...
+                obj.largura_pulso2,obj.interphase_gap,obj.fase_pulso,obj.atraso,obj.max_corr,...
+                obj.quant_bits,obj.T_Level,obj.C_Level);                   
         end
                                                   
-        function cis_ace(objeto)
-            openwav(objeto)
-            filtros(objeto)
-            ext_env(objeto)
-            comp(objeto)
-            ger_pulsos(objeto)
+        function cis_ace(obj) % Processamento das estrategias CIS e ACE
+            openwav(obj)
+            filtros(obj)
+            ext_env(obj)
+            comp(obj)
+            ger_pulsos(obj)
         end                     
         
     end
