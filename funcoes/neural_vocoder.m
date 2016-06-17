@@ -48,7 +48,7 @@ switch(carrier)
             Ruido = Ruido - median(Ruido); % força que a media seja = 0
             Ruido = Ruido/max(abs(Ruido)); % normaliza entre -1 e 1                  
             f1 = 165.4*(10^(0.06*(33-max(pos_eletrodo))-1));
-            Bandas = cochlearFilterBank(freq_amost, size(audio,1), f1 , Ruido);%;, bandwidths_in);            
+            Bandas = cochlearFilterBank(freq_amost, size(audio,1), f1 , Ruido);            
             Audio_bandas = Bandas.*audio;     
             Audio_out = zeros(size(audio,2),1)';
             for i = 1:size(audio,1) % Composicao de todas as bandas de audio

@@ -2,265 +2,264 @@
 % CsinalEntrada class by Rafael Chiea %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef CsinalEntrada < handle
-    %CsinalEntrada class of signal under test info
+    %% CsinalEntrada classe responsavel pelo sinal de entrada
     %   Smix = target + 1/SNR * noise
 
     properties
-        Xfile;      %.wav file associated to target signal
-        Nfile = 'no_noise';      %.wav file associated to noise signal, 'no_noise' = clean signal
-        SNRdB = Inf;    %signal to noise ratio
-        fs = 16000;   %sample rate
+        Xfile; % Arquivo .wav associado ao sinal da fonte
+        Nfile = 'no_noise'; % Arquivo .wav file associated to noise signal, 'no_noise' = clean signal
+        SNRdB = Inf; % Razao Sinal-Ruido (SNR) [dB]
+        fs = 16000; % Frequencia de amostragem do sinal de entrada
         DB_dir %='CD_Loizou/Databases/';
         noise_dir %='Noise_Recordings/';
         speech_dir %='Speech/IEEE_corpus/wideband/';
-        Tangle = 0;   %angle of the target signal(degrees) multiple of 5
-        Tdist = 80;   %distance = 80 cm or 300 cm
-        Nangle = 0;   %angle of the noise signal(degrees) multiple of 5
-        Ndist = 80;   %distance = 80 cm or 300 cm
-        side = 'left';   %side of the implant left/right
+        Tangle = 0; % Angulo de posicao da fonte sonora (graus) multiplo de 5
+        Tdist = 80; % Distancia da fonte = 80 cm a 300 cm
+        Nangle = 0; % Angulo de posicao da fonte de ruido (graus) multiplo de 5
+        Ndist = 80; % Distancia da fonte de ruido = 80 cm a 300 cm
+        side = 'left'; % Lado do IC: 'left' ou 'right'
     end
 
     properties(Access = private)
         PrvtSNR = Inf;
-        Prvttarget;     %target signal data
-        Prvtnoise = 0;      %noise signal data
-        PrvtSmix;     %noisy signal
+        Prvttarget; % Dados do sinal da fonte
+        Prvtnoise = 0; % Dados do sinal de ruido
+        PrvtSmix; % Sinal de ruido
     end
 
     properties(Dependent)
         SNR;
-        target;     %target signal data
-        noise;      %noise signal data
-        Smix;     %noisy signal
+        target; % Dados do sinal da fonte
+        noise; % Dados do sinal de ruido
+        Smix; % Sinal de ruido
     end
 
     methods
-        %% constructor
-        function objeto = CsinalEntrada(xf,nf,snrDB) %constructor
+        function obj = CsinalEntrada(xf,nf,snrDB) 
             switch nargin
                 case 0 
                 
                 case 1
-                    objeto.Xfile = xf;
+                    obj.Xfile = xf;
                 case 2
-                    objeto.Xfile = xf;
-                    objeto.Nfile = nf;
+                    obj.Xfile = xf;
+                    obj.Nfile = nf;
                 case 3
-                    objeto.Xfile = xf;
-                    objeto.Nfile = nf;
-                    objeto.SNRdB = snrDB;
+                    obj.Xfile = xf;
+                    obj.Nfile = nf;
+                    obj.SNRdB = snrDB;
                 otherwise
                     error('O numero de argumentos deve ser menor ou igual a 3')
             end
         end
         %% Gets
-        function val = get.SNR(objeto)
-            val = objeto.PrvtSNR;
+        function val = get.SNR(obj)
+            val = obj.PrvtSNR;
         end
-        function val = get.target(objeto)
-            val = objeto.Prvttarget;
+        function val = get.target(obj)
+            val = obj.Prvttarget;
         end
-        function val = get.noise(objeto)
-            val = objeto.Prvtnoise;
+        function val = get.noise(obj)
+            val = obj.Prvtnoise;
         end
-        function val = get.Smix(objeto)
-            val = objeto.PrvtSmix;
+        function val = get.Smix(obj)
+            val = obj.PrvtSmix;
         end
         %% Sets
-        function set.Xfile(objeto,xf)
+        function set.Xfile(obj,xf)
             if ischar(xf) && strcmp(xf(end-3: end), '.wav')
-                objeto.Xfile = xf;
-                objeto.ldTarget();
-                objeto.mix();
+                obj.Xfile = xf;
+                obj.ldTarget();
+                obj.mix();
             else
                 error('xf deve ser um arquivo .wav')
             end
         end
-        function set.Nfile(objeto,nf)
+        function set.Nfile(obj,nf)
             if ischar(nf) && (strcmp(nf(end-3: end), '.wav') || strcmp(nf,'no_noise'))
-                objeto.Nfile = nf;
-                objeto.ldNoise;
-                objeto.mix();
+                obj.Nfile = nf;
+                obj.ldNoise;
+                obj.mix();
             else
                 error('nf deve ser um arquivo .wav')
             end
         end
-        function set.SNRdB(objeto,snrDB)
+        function set.SNRdB(obj,snrDB)
             if isnumeric(snrDB)
-                objeto.SNRdB = snrDB;
-                objeto.ldSNR();
-                objeto.mix();
+                obj.SNRdB = snrDB;
+                obj.ldSNR();
+                obj.mix();
             else
                 error('snrDB deve ser numerico')
             end
         end
-        function set.fs(objeto,fs)
+        function set.fs(obj,fs)
             if isnumeric(fs)
-                objeto.fs = fs;
+                obj.fs = fs;
             else
                 error('taxa de amostragem fs deve ser numerico')
             end
         end
 
-        function set.Tangle(objeto,angle)
+        function set.Tangle(obj,angle)
             if mod(angle,5) == 0 || -180 < angle <= 180
-                objeto.Tangle = angle;
+                obj.Tangle = angle;
             else
                 error('o angulo deve ser numerico e multiplo de 5')
             end
-            objeto.ldTarget();
-            objeto.mix();
+            obj.ldTarget();
+            obj.mix();
         end
 
-        function set.Tdist(objeto,dist)
+        function set.Tdist(obj,dist)
             if dist == 80 || dist == 300
-                objeto.Tdist = dist;
+                obj.Tdist = dist;
             else
                 error('o angulo deve ser numerico e multiplo de 5')
             end
-            objeto.ldTarget();
-            objeto.mix();
+            obj.ldTarget();
+            obj.mix();
         end
 
-        function set.Nangle(objeto,angle)
+        function set.Nangle(obj,angle)
             if mod(angle,5) == 0 || -180 < angle <= 180
-                objeto.Nangle = angle;
+                obj.Nangle = angle;
             else
                 error('o angulo deve ser numerico e multiplo de 5')
             end
-            objeto.ldNoise();
-            objeto.mix();
+            obj.ldNoise();
+            obj.mix();
         end
 
-        function set.Ndist(objeto,dist)
+        function set.Ndist(obj,dist)
             if dist == 80 || dist == 300
-                objeto.Ndist = dist;
+                obj.Ndist = dist;
             else
                 error('o angulo deve ser numerico e multiplo de 5')
             end
-            objeto.ldNoise();
-            objeto.mix();
+            obj.ldNoise();
+            obj.mix();
         end
 
-        function set.side(objeto,sd)
+        function set.side(obj,sd)
             if strcmp(sd,'left') || strcmp(sd,'right')
-                objeto.side = sd;
+                obj.side = sd;
             else
                 error('o lado dever ser "left" ou "right"')
             end
-            objeto.ldNoise();
-            objeto.ldTarget();
-            objeto.mix;
+            obj.ldNoise();
+            obj.ldTarget();
+            obj.mix;
         end
         %% functions
-        function ldTarget(objeto)
-            path = strcat(objeto.DB_dir,objeto.speech_dir,objeto.Xfile);
+        function ldTarget(obj)
+            path = strcat(obj.DB_dir,obj.speech_dir,obj.Xfile);
             [S, Fsmpl] = audioread(path);    %loads signal
-            S = S-mean(S);
-            if Fsmpl ~= objeto.fs;
-                S = resample(S,objeto.fs,Fsmpl);
+            S = S - mean(S);
+            if Fsmpl ~= obj.fs;
+                S = resample(S,obj.fs,Fsmpl);
             end
 
-            %target direction
-            IR=loadHRIR1('Anechoic', objeto.Tdist, 0, objeto.Tangle, 'front');
-            HRIR = resample(IR.data,objeto.fs,IR.fs);
+            % Direcao da fonte
+            IR = loadHRIR1('Anechoic', obj.Tdist, 0, obj.Tangle, 'front');
+            HRIR = resample(IR.data,obj.fs,IR.fs);
             in_lft = filter(HRIR(:,1),1,S);
             in_rgt = filter(HRIR(:,2),1,S);
             norm = .9/max(abs([in_lft ; in_rgt]));
             in_lft = norm*in_lft;
             in_rgt = norm*in_rgt;
 
-            %choose side
-            switch objeto.side
+            % Escolha do lado esquerdo/direito 
+            switch obj.side
                 case 'left'
                     Sin = in_lft;
                 case 'right'
                     Sin = in_rgt;
                 otherwise
-                    error('objeto.side deve ser "left" ou "right"')
+                    error('obj.side deve ser "left" ou "right"')
             end
-            objeto.Prvttarget = Sin;
+            obj.Prvttarget = Sin;
         end
 
-        function ldNoise(objeto)
-            if strcmp(objeto.Nfile,'no_noise')
-                objeto.Prvtnoise = 0;
+        function ldNoise(obj)
+            if strcmp(obj.Nfile,'no_noise')
+                obj.Prvtnoise = 0;
                 return;
             end
-            path=strcat(objeto.DB_dir,objeto.noise_dir,objeto.Nfile);
+            path = strcat(obj.DB_dir,obj.noise_dir,obj.Nfile);
             [N, Fsmpl] = audioread(path);    %loads signal
             N = N - mean(N);
-            if Fsmpl ~= objeto.fs;
-                N = resample(N,objeto.fs,Fsmpl);
+            if Fsmpl ~= obj.fs;
+                N = resample(N,obj.fs,Fsmpl);
             end
 
-            %noise direction
-            IR = loadHRIR1('Anechoic', objeto.Ndist, 0, objeto.Nangle, 'front');
-            HRIR = resample(IR.data,objeto.fs,IR.fs);
+            % Direcao do ruido
+            IR = loadHRIR1('Anechoic', obj.Ndist, 0, obj.Nangle, 'front');
+            HRIR = resample(IR.data,obj.fs,IR.fs);
             in_lft = filter(HRIR(:,1),1,N);
             in_rgt = filter(HRIR(:,2),1,N);
             norm = .9/max(abs([in_lft ; in_rgt]));
             in_lft = norm*in_lft;
             in_rgt = norm*in_rgt;
 
-            %choose side
-            switch objeto.side
+            % Escolha do lado esquerdo/direito 
+            switch obj.side
                 case 'left'
                     Nin = in_lft;
                 case 'right'
                     Nin = in_rgt;
                 otherwise
-                    error('objeto.side deve ser "left" ou "right"')
+                    error('obj.side deve ser "left" ou "right"')
             end
-            objeto.Prvtnoise = Nin;
+            obj.Prvtnoise = Nin;
         end
 
-        function ldSNR(objeto)
-            objeto.PrvtSNR = 10^(objeto.SNRdB/20);
+        function ldSNR(obj)
+            obj.PrvtSNR = 10^(obj.SNRdB/20);
         end
 
-        function mix(objeto)
+        function mix(obj)
             %mix sound + noise
-            if (isempty(objeto.target) || isempty(objeto.noise) || isempty(objeto.SNRdB))
+            if (isempty(obj.target) || isempty(obj.noise) || isempty(obj.SNRdB))
                 return;
             end
 
-            if strcmp(objeto.Nfile,'no_noise')
-                objeto.PrvtSmix = objeto.target;
+            if strcmp(obj.Nfile,'no_noise')
+                obj.PrvtSmix = obj.target;
                 return;
             end
 
             %% equal size
-            Ls = length(objeto.target);
-            Ln = length(objeto.noise);
+            Ls = length(obj.target);
+            Ln = length(obj.noise);
 
 
             if Ls > Ln
                 rpt = fix(Ls/Ln);
                 diff = rem(Ls,Ln);
                 aux0 = floor(rand(1,1)*(Ln-diff));
-                objeto.Prvtnoise = [repmat(objeto.noise,rpt,1);objeto.noise(aux0+1:aux0+diff)];
+                obj.Prvtnoise = [repmat(obj.noise,rpt,1);obj.noise(aux0+1:aux0+diff)];
             else
                 aux0 = floor(rand(1,1)*(Ln-Ls));
-                objeto.Prvtnoise = objeto.noise(aux0+1:aux0+Ls);    %noise file is ramdomly cut
+                obj.Prvtnoise = obj.noise(aux0+1:aux0+Ls);    %noise file is ramdomly cut
             end
             %% mix at SNR
-            [objeto.PrvtSmix, objeto.Prvtnoise] = s_and_n(objeto.target, objeto.noise, objeto.SNRdB);
-            maxim = max(abs(objeto.PrvtSmix));
+            [obj.PrvtSmix, obj.Prvtnoise] = s_and_n(obj.target, obj.noise, obj.SNRdB);
+            maxim = max(abs(obj.PrvtSmix));
             if maxim > 1
-                objeto.PrvtSmix = objeto.PrvtSmix/maxim;
+                obj.PrvtSmix = obj.PrvtSmix/maxim;
             end
         end
 
-        function [srmr0,intel0] = intelsrmr(objeto)
-            if objeto.fs ~= 8000 && objeto.fs ~= 16000
+        function [srmr0,intel0] = intelsrmr(obj)
+            if obj.fs ~= 8000 && obj.fs ~= 16000
                 Fs1 = 16000;  %sample frequency for SRMR_CI function
-                Xf = resample(objeto.Smix,Fs1,objeto.fs);
-                X = resample(objeto.target,Fs1,objeto.fs);
+                Xf = resample(obj.Smix,Fs1,obj.fs);
+                X = resample(obj.target,Fs1,obj.fs);
             else
-                Xf = objeto.Smix;
-                X = objeto.target;
-                Fs1 = objeto.fs;
+                Xf = obj.Smix;
+                X = obj.target;
+                Fs1 = obj.fs;
             end
             srmr0 = SRMR_CI(Xf,Fs1,'norm',1);
 
@@ -271,8 +270,8 @@ classdef CsinalEntrada < handle
             intel0 = 88.92./(1+exp(-(alpha(1)+alpha(2)*srmr_norm)));
         end
 
-        function pesq0 = pesq_calc(objeto)
-            score = PESQa(objeto.target,objeto.Smix,objeto.fs);
+        function pesq0 = pesq_calc(obj)
+            score = PESQa(obj.target,obj.Smix,obj.fs);
             pesq0 = score;
         end
 
