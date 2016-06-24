@@ -1,11 +1,14 @@
 classdef CsimIC < CmodeloNA
-    % CsimIC Classe para criacao do objeto de simulacao, reconstrucao do
+    %% CsimIC Classe para criacao do objeto de simulacao, reconstrucao do
     % sinal e avaliacao objetiva dos resultados
     
     properties
         nome_sinal_reconst % Nome do arquivo gerado para o sinal reconstruido
         audio_reconst % Sinal de audio reconstruido
-        carrier = 'Harmonic Complex'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
+        carrier = 'Senoidal'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'HC'
+        numhar_HC = 240; % Numero de harmonicos no complexo
+        df_HC = 100; % Discretizacao do complexo harmonico
+        F0_HC = 100; % Frequencia fundamental do complexo harmonico
         tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
         tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
         SRMR_NH % Valor da metrica SRMR-NH
@@ -20,30 +23,38 @@ classdef CsimIC < CmodeloNA
             obj@CmodeloNA(arquivo_dat,nome_sinal_entrada);
         end
        
-        function vocoder(obj,flag) % Reconstrucao atraves do vocder: 'Normal' ou 'Ne'
+        function vocoder(obj,flag) % Reconstrucao atraves do vocoder: 'Normal' ou 'Neural'
+            if (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 > obj.freq_amost
+                display('A condicao (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 <= obj.freq_amost deve ser seguida');
+                error('Frequencia de amostragem baixa para os filtros de alta frequencia!!!');             
+            else
+                
             switch(obj.tipo_vocoder)
                 
                 case 'Normal'
                 obj.audio_reconst = vocoder(obj.Csinal_processador.env,obj.freq_amost,...
-                obj.carrier,obj.bandas_freq_entrada,...
-                obj.sup_freq,obj.inf_freq,...
-                obj.vet_tempo);
+                obj.carrier, obj.baixa_freq, obj.vet_tempo,...
+                obj.F0_HC,obj.df_HC,obj.numhar_HC);
                     if flag == 1
-                        nv = '_vocoder_hc.wav';
-                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),saida,obj.freq_amost)
+                        nv = strcat('_Vocoder_',obj.carrier,'.wav');
+                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
                     
                 case 'Neural'
-                    obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo);
+                    obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
+                    obj.baixa_freq, obj.F0_HC, obj.df_HC, obj.numhar_HC);
                     if flag == 1
-                        nv = strcat('_neural_vocoder_hc','.wav');
+                        nome_sinal_reconst =
+                        nv = strcat('_Neural_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
+            end
+            
             end
         end
         
         
-        function plotSpikes(obj)
+        function plotSpikes(obj) % Plota a matriz de disparos obtida com o modelo do NA
             [y,x] = find(obj.spike_matrix);
             x = x/(2*obj.freq_amost_pulsos);
             figure()
@@ -54,7 +65,7 @@ classdef CsimIC < CmodeloNA
             set(gca,'Ydir','reverse')
         end
         
-        function plotEletrodograma(obj)
+        function plotEletrodograma(obj) % Plota o eletrodograma com a serie de pulsos
             canal_min = 1;
             canal_max = obj.num_canais;
             figure()
@@ -79,7 +90,7 @@ classdef CsimIC < CmodeloNA
             
         end
         
-        function plotEspectrograma(obj)
+        function plotEspectrograma(obj) % Plota o espectrograma do sinal de entrada
             switch obj.tipo_espec               
                 case 'Wavelet'
                     figure()
@@ -111,7 +122,7 @@ classdef CsimIC < CmodeloNA
             end
         end
         
-        function plotNeurograma(obj)
+        function plotNeurograma(obj) % Plota o neurograma obtido com o modelo do NA
                 x_Ap = (1:size(obj.Ap,2))*obj.dtn_A/2;
                 y_Ap = 1:size(obj.Ap,1);
                 figure()
@@ -126,7 +137,7 @@ classdef CsimIC < CmodeloNA
                 view(0, 270)
         end
         
-        function plotFiltros(obj)
+        function plotFiltros(obj) % Plota o banco de filtros utilizado
              switch obj.tipo_filtro
                  case 'Gammatone'
                     np = 2048;
@@ -135,25 +146,25 @@ classdef CsimIC < CmodeloNA
                     freqScale = (0:(np-1))/np*obj.freq_amost;
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
-                    axis([1e2 0.8e4 -30 0])
+                    axis([1e2 0.8e4 -80 0])
                     xlabel('Frequência (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10); 
                  
                  case 'Nucleus'
                     np = 2048;
-                    y = CIFilterBank(obj.freq_amost, obj.num_canais,obj.central_freq(1), [1 zeros(1,(np-1))], obj.bandas_freq_entrada(1:obj.num_canais));
+                    y = CIFilterBank(obj.freq_amost, obj.num_canais,obj.central_freq(1), [1 zeros(1,(np-1))]);
                     resp = 20*log10(abs(fft(y')));
                     freqScale = (0:(np-1))/np*obj.freq_amost;
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
-                    axis([1e2 0.8e4 -30 0])
+                    axis([1e2 0.8e4 -80 0])
                     xlabel('Frequência (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10);
              end
                     
         end
         
-        function calcSRMR(obj)
+        function calcSRMR(obj) % Calcula os valores de SRMR-NH e SRMR-CI
                 obj.SRMR_NH = SRMR(obj.audio_reconst,obj.freq_amost);
                 obj.SRMR_IC = SRMR_CI(obj.audio_reconst,obj.freq_amost);
         end

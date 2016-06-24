@@ -2,7 +2,7 @@ classdef CmodeloNA < Cprocessador
     %% CmodeloNA Classe responsavel pela modelagem da resposta do Nervo Auditivo
     
     properties
-        dn_freq_amost = 10; % Discretizacao da nova freq amost (dn_freq_amost*freq_amost)
+        dn_freq_amost = 3; % Discretizacao da nova freq amost (dn_freq_amost*freq_amost)
         dist_corr % Distribuicao de corrente
         spike_matrix % Matriz de spikes
         V_mem % Potencial de membrana ao longo do tempo
@@ -18,7 +18,7 @@ classdef CmodeloNA < Cprocessador
         V_ruido_mem = [-2e-3 2e-3];  % Potencial de ruido [V] | Distribuicao normal entre -2mV e 2mV
         tipo_esp_corr = 'Gauss'; % Modelo de espalhamento de corrente: 'Exp' ou 'Gauss'
         pos_inicial = 0; % Posicao inicial do arrranjo de eletrodos inserido na coclea [mm]
-        pos_eletrodo % Vetor de posicao de cada eletrodo no arranjo
+        pos_eletrodo = fliplr(1:22); % Vetor de posicao de cada eletrodo no arranjo
         dx_eletrodo = 1; % Distancia entre eletrodos [mm]
         Z_eletrodo = 5e3*ones(22,1); % Impedancia dos canais do implante [Ohm]
         pulsos_corr % Series de pulsos de corrente
@@ -65,7 +65,7 @@ classdef CmodeloNA < Cprocessador
             obj.freq_amost_pulsos,obj.tipo_esp_corr,...
             obj.lambda,obj.dtn_A, obj.N_neurons, obj.R_mem,obj.C_mem,...
             obj.dt_refrat_abs,obj.V_thr_mem,obj.V_rest_mem,obj.V_ruido_mem,...
-            obj.pos_inicial, obj.dx_eletrodo, obj.Z_eletrodo);    
+            obj.pos_inicial, obj.dx_eletrodo, obj.Z_eletrodo,obj.fase_pulso);    
         end 
     end
     

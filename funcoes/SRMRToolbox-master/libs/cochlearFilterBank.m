@@ -15,10 +15,10 @@
 % system.  The output is nCochlearFilters number of signals, and a
 % corresponding vector containing the ERB values for each filter.
 
-function cochlearOutputs = cochlearFilterBank(fs, nCochlearFilters, lowFreq, s)
+function [cochlearOutputs, ERB, cf] = cochlearFilterBank(fs, nCochlearFilters, lowFreq, s)
 
 % Construct the cochlear filter bank and filter the signal through it.
-filterbankCoefs = MakeERBFilters(fs, nCochlearFilters, lowFreq);
+[filterbankCoefs, ERB, cf] = MakeERBFilters(fs, nCochlearFilters, lowFreq);
 cochlearOutputs = ERBFilterBank(s, filterbankCoefs);
 
 end

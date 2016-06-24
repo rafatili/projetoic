@@ -5,7 +5,10 @@ classdef CsimIC < CmodeloNA
     properties
         nome_sinal_reconst % Nome do arquivo gerado para o sinal reconstruido
         audio_reconst % Sinal de audio reconstruido
-        carrier = 'Harmonic Complex'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'Harmonic Complex'
+        carrier = 'Senoidal'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'HC'
+        numhar_HC = 240; % Numero de harmonicos no complexo
+        df_HC = 100; % Discretizacao do complexo harmonico
+        F0_HC = 100; % Frequencia fundamental do complexo harmonico
         tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
         tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
         SRMR_NH % Valor da metrica SRMR-NH
@@ -21,22 +24,33 @@ classdef CsimIC < CmodeloNA
         end
        
         function vocoder(obj,flag) % Reconstrucao atraves do vocoder: 'Normal' ou 'Neural'
+            if (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 > obj.freq_amost
+                display('A condicao (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 <= obj.freq_amost deve ser seguida');
+                error('Frequencia de amostragem baixa para os filtros de alta frequencia!!!');             
+            else
+                
             switch(obj.tipo_vocoder)
                 
                 case 'Normal'
                 obj.audio_reconst = vocoder(obj.Csinal_processador.env,obj.freq_amost,...
-                obj.carrier, obj.sup_freq,obj.inf_freq, obj.vet_tempo);
+                obj.carrier, obj.baixa_freq, obj.vet_tempo,...
+                obj.F0_HC,obj.df_HC,obj.numhar_HC);
                     if flag == 1
-                        nv = '_vocoder_hc.wav';
-                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),saida,obj.freq_amost)
+                        obj.nome_sinal_reconst = obj.nome_sinal_entrada;
+                        nv = strcat('_Vocoder_',obj.carrier,'.wav');
+                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
                     
                 case 'Neural'
-                    obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo);
+                    obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
+                    obj.baixa_freq, obj.F0_HC, obj.df_HC, obj.numhar_HC);
                     if flag == 1
-                        nv = strcat('_neural_vocoder_hc','.wav');
+                        obj.nome_sinal_reconst = obj.nome_sinal_entrada;
+                        nv = strcat('_Neural_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
+            end
+            
             end
         end
         

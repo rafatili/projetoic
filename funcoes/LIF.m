@@ -1,6 +1,6 @@
 function [dist_corr,spike_matrix, V_mem, Ap, pos_eletrodo] = LIF(PulsosCorr,num_canais,...
-    freq_amost_pulsos,tipo_esp_corr,lambda,dtn_A,N_neurons,R_mem, C_mem,dt_refrat_abs,...
-    Vthr_mem, V_rest_mem,V_ruido_mem, pos_inicial, dx_eletrodo, Z_eletrodo)
+    freq_amost_pulsos, tipo_esp_corr, lambda, dtn_A, N_neurons, R_mem, C_mem,dt_refrat_abs,...
+    Vthr_mem, V_rest_mem,V_ruido_mem, pos_inicial, dx_eletrodo, Z_eletrodo, fase_pulso)
 
 %% Propriedades
 
@@ -32,6 +32,18 @@ dx_coclea = comp_coclea/N_neurons; % distância entre neurônios [mm]
 x_coclea = 0:dx_coclea:comp_coclea-dx_coclea; % vetor de posição dos neurônios [mm]
 
 %% Distribuicao da corrente
+
+if strcmp(fase_pulso,'Catodico')==1
+    PulsosCorr = -PulsosCorr;
+end
+
+for i = 1:size(PulsosCorr,1)
+    for j = 1:size(PulsosCorr,2)
+        if PulsosCorr(i,j) < 0
+            PulsosCorr(i,j) = 0;
+        end
+    end 
+end
 
 dist_corr = zeros(length(x_coclea),size(PulsosCorr,2));
 
