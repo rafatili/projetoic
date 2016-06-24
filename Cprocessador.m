@@ -4,7 +4,7 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
     
     properties 
         Csinal_processador % Classe com sinais de cada bloco de processamento
-        tipo_filtro = 'Nucleus' % Tipo de filtro para o banco do IC: 'Gammatone' ; 'Nucleus';
+        tipo_filtro = 'ERB' % Tipo de filtro para o banco do IC: 'ERB' ; 'Nucleus';
         tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
@@ -13,10 +13,12 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         fase_pulso = 'Catodico' % Fase inicial do pulso (meia onda 1): 'Anodico' (+) ou 'Catodico' (-)
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilizacao das informacoes do 'paciente padrao' da clase
-        baixa_freq = 150 % Frequencia central do filtro de baixa frequencia
+        baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstituição
         nome_sinal_entrada % nome do arquivo de entrada de audio
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         max_corr = 1.75e-3 % Maxima corrente do gerador
+        ERB_bandas % Largura das bandas filtro Gammatone ERB
+        ERB_cf % Frequencias centrais filtro Gammatone ERB
     end
     
     properties (Dependent)
@@ -85,8 +87,8 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         function filtros(obj) % Banco de filtros do IC
             switch(obj.tipo_filtro)
                 
-                case 'Gammatone'
-                obj.Csinal_processador.filt = cochlearFilterBank(...
+                case 'ERB'
+                [obj.Csinal_processador.filt, obj.ERB_bandas, obj.ERB_cf] = cochlearFilterBank(...
                     obj.freq_amost, obj.num_canais, obj.baixa_freq, obj.Csinal_processador.in);
                 
                 case 'Nucleus'
