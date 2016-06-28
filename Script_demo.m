@@ -2,7 +2,6 @@ clear all
 clc
 close all
 
-addpath(genpath('./projetoic'))
 Iniciar_SimIC
 
 % objeto criado: "sim"

@@ -57,7 +57,7 @@ function hrir = loadHRIR1(environment,varargin)
 
 
 % Change this path to an absolute path if you need.
-baseDirectory = '/home/rafael/MEGAsync/Matlab/HRIR_database_mat/hrir';
+% baseDirectory = './funcoes/hrir';
 % original é './hrir';
 
 
@@ -89,9 +89,13 @@ switch environment
                 flipData = true;
                 varargin{3}=-varargin{3};
             end
-            hrir = load(fullfile(baseDirectory,environment,[environment '_distcm_' ...
+%             hrir = load(fullfile(baseDirectory,environment,[environment '_distcm_' ...
+%                 num2str(varargin{1}) '_el_' num2str(varargin{2}) '_az_' ...
+%                 num2str(varargin{3}) '.mat']));
+            hrir = load([environment '_distcm_' ...
                 num2str(varargin{1}) '_el_' num2str(varargin{2}) '_az_' ...
-                num2str(varargin{3}) '.mat']));
+                num2str(varargin{3}) '.mat']);
+            
         end
     case 'office_i'
         environment = 'office_I';
@@ -105,9 +109,12 @@ switch environment
         if all(varargin{1} ~= -90 : 5 : 90)
             error(['Azimuth angle not available: ' num2str(varargin{1})])
         else
-            hrir = load(fullfile(baseDirectory,environment,[environment ...
+%             hrir = load(fullfile(baseDirectory,environment,[environment ...
+%                 '_distcm_100_el_0_az_' ...
+%                 num2str(varargin{1}) '.mat']));
+            hrir = load([environment ...
                 '_distcm_100_el_0_az_' ...
-                num2str(varargin{1}) '.mat']));
+                num2str(varargin{1}) '.mat']);
         end
     case {'office_ii','cafeteria','courtyard'}
         if strcmpi(environment,'office_ii')
@@ -128,8 +135,10 @@ switch environment
         elseif all(~strcmpi(varargin{2},{'A' 'B' 'C' 'D' 'E' 'F'}))
             error(['Sourceposition not available: ' upper(varargin{2})])
         else
-            hrir = load(fullfile(baseDirectory,environment,[environment ...
-                '_' num2str(varargin{1}) '_' upper(varargin{2}) '.mat']));
+%             hrir = load(fullfile(baseDirectory,environment,[environment ...
+%                 '_' num2str(varargin{1}) '_' upper(varargin{2}) '.mat']));
+            hrir = load([environment ...
+                '_' num2str(varargin{1}) '_' upper(varargin{2}) '.mat']);
         end
     otherwise
         error(['Environment ''' environment ''' is not available.'])
