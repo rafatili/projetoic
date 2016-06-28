@@ -19,8 +19,9 @@ classdef CsimIC < CmodeloNA
 
     
     methods
-        function obj = CsimIC(arquivo_dat,nome_sinal_entrada) % Funcao geral da Classe           
-            obj@CmodeloNA(arquivo_dat,nome_sinal_entrada);
+        function obj = CsimIC(arquivo_dat,varargin) % Funcao geral da Classe
+            % varargin = {arquivo .wav de audio alvo, arquivo .wav do ruido, SNRdB}
+            obj@CmodeloNA(arquivo_dat,varargin{:});
         end
        
         function vocoder(obj,flag) % Reconstrucao atraves do vocoder: 'Normal' ou 'Neural'
@@ -36,7 +37,7 @@ classdef CsimIC < CmodeloNA
                 obj.carrier, obj.baixa_freq, obj.vet_tempo,...
                 obj.F0_HC,obj.df_HC,obj.numhar_HC);
                     if flag == 1
-                        obj.nome_sinal_reconst = obj.nome_sinal_entrada;
+                        obj.nome_sinal_reconst = obj.arqX;
                         nv = strcat('_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
@@ -45,7 +46,7 @@ classdef CsimIC < CmodeloNA
                     obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
                     obj.baixa_freq, obj.F0_HC, obj.df_HC, obj.numhar_HC);
                     if flag == 1
-                        obj.nome_sinal_reconst = obj.nome_sinal_entrada;
+                        obj.nome_sinal_reconst = obj.arqX;
                         nv = strcat('_Neural_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
@@ -62,7 +63,7 @@ classdef CsimIC < CmodeloNA
             plot(x,y,'.k','MarkerSize',2)
             ylim([0 max(y)])
             xlabel('Tempo(s)')
-            ylabel('Neurônio "n" (da base (0) ao ápice (N))')
+            ylabel('Neurï¿½nio "n" (da base (0) ao ï¿½pice (N))')
             set(gca,'Ydir','reverse')
         end
         
@@ -86,7 +87,7 @@ classdef CsimIC < CmodeloNA
                     xlim([0 max(obj.vet_tempo)])
                     xlabel('t(s)')
                 end
-            suplabel('Número do eletrodo','y',[.125 .125 .8 .8]);
+            suplabel('Nï¿½mero do eletrodo','y',[.125 .125 .8 .8]);
             end
             
         end
@@ -133,7 +134,7 @@ classdef CsimIC < CmodeloNA
                 ylim([1 obj.num_canais])
                 xlim([obj.dtn_A max(x_Ap)])
                 xlabel('Tempo(s)')
-                ylabel('População no eletrodo "N" (da base ao ápice)')
+                ylabel('Populaï¿½ï¿½o no eletrodo "N" (da base ao ï¿½pice)')
                 ylabel(c,'Taxa de disparos (spikes/s)')
                 view(0, 270)
         end
@@ -148,7 +149,7 @@ classdef CsimIC < CmodeloNA
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
                     axis([1e2 0.8e4 -80 0])
-                    xlabel('Frequência (Hz)','FontSize',10);
+                    xlabel('Frequï¿½ncia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10); 
                  
                  case 'Nucleus'
@@ -159,7 +160,7 @@ classdef CsimIC < CmodeloNA
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
                     axis([1e2 0.8e4 -80 0])
-                    xlabel('Frequência (Hz)','FontSize',10);
+                    xlabel('Frequï¿½ncia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10);
              end
                     

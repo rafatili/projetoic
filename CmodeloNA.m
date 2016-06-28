@@ -31,8 +31,9 @@ classdef CmodeloNA < Cprocessador
     end
     
     methods
-        function obj = CmodeloNA(arquivo_dat,nome_sinal_entrada)         
-            obj@Cprocessador(arquivo_dat,nome_sinal_entrada);
+        function obj = CmodeloNA(arquivo_dat,varargin)
+            % varargin = {arquivo .wav de audio alvo, arquivo .wav do ruido, SNRdB}
+            obj@Cprocessador(arquivo_dat,varargin{:});
         end
         
         function val = get.freq_amost_pulsos(obj)

@@ -13,8 +13,8 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         fase_pulso = 'Catodico' % Fase inicial do pulso (meia onda 1): 'Anodico' (+) ou 'Catodico' (-)
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilizacao das informacoes do 'paciente padrao' da clase
-        baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstituição
-        nome_sinal_entrada % nome do arquivo de entrada de audio
+        baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstituiï¿½ï¿½o
+        
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         max_corr = 1.75e-3 % Maxima corrente do gerador
         ERB_bandas % Largura das bandas filtro Gammatone ERB
@@ -26,33 +26,24 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         T_total % Tempo total do arquivo de entrada      
         num_bits % Numero de bits do arquivo de entrada 
         vet_tempo % Vetor temporal do arquivo de entrada
-        freq_amost % Frequencia de amostragem
         max_corr_paciente % Corrente maxima suportada pelo paciente
     end
     
     methods % Funcoes da Classe
-        function obj = Cprocessador(arquivo_dat,prop2)           
+        function obj = Cprocessador(arquivo_dat, varargin)
+            % varargin = {arquivo .wav de audio alvo, arquivo .wav do ruido, SNRdB}            
             obj@Cpaciente(arquivo_dat);
-            obj@CsinalEntrada(); 
-            if nargin == 2
-                obj.nome_sinal_entrada = prop2;
-            else 
-                error('Wrong number of input arguments')                                     
-            end
+            obj@CsinalEntrada(varargin{:});
         end 
         
 %% GET (Definicao das variaveis dependentes)      
-        
-        function val = get.freq_amost(obj)
-            [~ , val]= audioread(obj.nome_sinal_entrada);
-        end       
-        
+                
         function val = get.dt(obj)
                 val = 1/obj.freq_amost;
         end
         
         function val = get.T_total(obj)
-                var = audioinfo(obj.nome_sinal_entrada);
+                var = audioinfo(obj.arqX);
                 val = var.Duration;
         end
         
@@ -61,7 +52,7 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         end      
         
         function val = get.num_bits(obj)
-                var = audioinfo(obj.nome_sinal_entrada);
+                var = audioinfo(obj.arqX);
                 val = var.BitsPerSample;
         end
         
@@ -71,15 +62,14 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         
 %% OUTRAS FUNCOES
 
-        function openwav(obj) % Importa um sinal .wav como entrada
-%             [var1, var2] = audioread(obj.nome_sinal_entrada);
-%             obj.Csinal_processador.in = resample(var1,obj.freq_amost,var2);
-            obj.Csinal_processador.in = audioread(obj.nome_sinal_entrada);
+        function openwav(obj) % Importa o sinal de entrada da classe CsinalEntrada
+            obj.Csinal_processador.in = obj.Smescla;
         end
 
-        function play(obj) % Reproducao do sinal de entrada
-            sound(obj.Csinal_processador.in,obj.freq_amost)          
-        end
+%         function play(obj) % Reproducao do sinal de entrada
+%             sound(obj.Csinal_processador.in,obj.freq_amost)          
+%         end
+%         FUNCAO SUBSTITUIDA PELA FUNCAO 'reproduz_audio' DA CLASSE CsinalEntrada
         
         
 %% BLOCOS
