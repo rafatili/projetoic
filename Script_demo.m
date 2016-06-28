@@ -6,7 +6,7 @@ addpath(genpath('./projetoic'))
 Iniciar_SimIC
 
 % objeto criado: "sim"
-sim = CsimIC('p_cochlear_1.dat','chão_16k.wav'); 
+sim = CsimIC('p_cochlear_1.dat','asa.wav'); 
 
 % selecao de alguns parametros
 sim.num_canais = 22; 
