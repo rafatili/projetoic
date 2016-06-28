@@ -23,6 +23,7 @@ classdef CmodeloNA < Cprocessador
         Z_eletrodo = 5e3*ones(22,1); % Impedancia dos canais do implante [Ohm]
         pulsos_corr % Series de pulsos de corrente
         t_pulsos_corr % Vetor de tempo para series de pulso
+        spike_matrix_Zilany
         
     end
     
@@ -67,7 +68,12 @@ classdef CmodeloNA < Cprocessador
             obj.lambda,obj.dtn_A, obj.N_neurons, obj.R_mem,obj.C_mem,...
             obj.dt_refrat_abs,obj.V_thr_mem,obj.V_rest_mem,obj.V_ruido_mem,...
             obj.pos_inicial, obj.dx_eletrodo, obj.Z_eletrodo,obj.fase_pulso);    
-        end 
+        end
+        
+        function Modelo_Zilany(obj)
+            obj.spike_matrix_Zilany = zilany2014(obj.C_SPL,obj.Csinal_processador.in,obj.freq_amost,...
+                'flow',obj.baixa_freq,'nfibers',obj.N_neurons,'fhigh',obj.freq_amost/2);
+        end
     end
     
 end

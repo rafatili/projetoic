@@ -11,6 +11,7 @@ classdef CsimIC < CmodeloNA
         F0_HC = 100; % Frequencia fundamental do complexo harmonico
         tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
         tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
+        tipo_spike_matrix = 'LIF'; % Tipo de matriz de disparos: 'LIF' (Modelo eletrico), 'Zilany'(Modelo acustico)
         SRMR_NH % Valor da metrica SRMR-NH
         SRMR_IC % Valor da metrica SRMR-CI
         Intel_SRMR_NH % Previsao da inteligibilidade para a metrica SRMR-NH
@@ -57,14 +58,27 @@ classdef CsimIC < CmodeloNA
         
         
         function plotSpikes(obj) % Plota a matriz de disparos obtida com o modelo do NA
-            [y,x] = find(obj.spike_matrix);
-            x = x/(2*obj.freq_amost_pulsos);
-            figure()
-            plot(x,y,'.k','MarkerSize',2)
-            ylim([0 max(y)])
-            xlabel('Tempo(s)')
-            ylabel('Neur�nio "n" (da base (0) ao �pice (N))')
-            set(gca,'Ydir','reverse')
+            switch(obj.tipo_spike_matrix)
+                case 'LIF'
+                    [y,x] = find(obj.spike_matrix);
+                    x = x/(2*obj.freq_amost_pulsos);
+                    figure()
+                    plot(x,y,'.k','MarkerSize',2)
+                    ylim([0 max(y)])
+                    xlabel('Tempo(s)')
+                    ylabel('Neuronio "n" (da base (0) ao apice (N))')
+                    set(gca,'Ydir','reverse')
+                
+                case 'Zilany'
+                    [y,x] = find(obj.spike_matrix_Zilany);
+                    x = x/(1e5);
+                    figure()
+                    plot(x,y,'.k','MarkerSize',2)
+                    ylim([0 max(y)])
+                    xlabel('Tempo(s)')
+                    ylabel('Neuronio "n" (da base (0) ao apice (N))')
+                    %set(gca,'Ydir','reverse')
+            end
         end
         
         function plotEletrodograma(obj) % Plota o eletrodograma com a serie de pulsos
@@ -87,7 +101,7 @@ classdef CsimIC < CmodeloNA
                     xlim([0 max(obj.vet_tempo)])
                     xlabel('t(s)')
                 end
-            suplabel('N�mero do eletrodo','y',[.125 .125 .8 .8]);
+            suplabel('Numero do eletrodo','y',[.125 .125 .8 .8]);
             end
             
         end
@@ -134,14 +148,14 @@ classdef CsimIC < CmodeloNA
                 ylim([1 obj.num_canais])
                 xlim([obj.dtn_A max(x_Ap)])
                 xlabel('Tempo(s)')
-                ylabel('Popula��o no eletrodo "N" (da base ao �pice)')
+                ylabel('Populacao no eletrodo "N" (da base ao apice)')
                 ylabel(c,'Taxa de disparos (spikes/s)')
                 view(0, 270)
         end
         
         function plotFiltros(obj) % Plota o banco de filtros utilizado
              switch obj.tipo_filtro
-                 case 'Gammatone'
+                 case 'ERB'
                     np = 2048;
                     y = cochlearFilterBank(obj.freq_amost, obj.num_canais,obj.central_freq(1), [1 zeros(1,(np-1))]);
                     resp = 20*log10(abs(fft(y')));
@@ -149,7 +163,7 @@ classdef CsimIC < CmodeloNA
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
                     axis([1e2 0.8e4 -80 0])
-                    xlabel('Frequ�ncia (Hz)','FontSize',10);
+                    xlabel('Frequencia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10); 
                  
                  case 'Nucleus'
@@ -160,7 +174,7 @@ classdef CsimIC < CmodeloNA
                     figure()
                     semilogx(freqScale(1:(np/2-1)),resp(1:(np/2-1),:),'LineWidth',1);
                     axis([1e2 0.8e4 -80 0])
-                    xlabel('Frequ�ncia (Hz)','FontSize',10);
+                    xlabel('Frequencia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10);
              end
                     

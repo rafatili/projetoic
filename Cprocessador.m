@@ -5,7 +5,7 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
     properties 
         Csinal_processador % Classe com sinais de cada bloco de processamento
         tipo_filtro = 'ERB' % Tipo de filtro para o banco do IC: 'ERB' ; 'Nucleus';
-        tipo_env = 'Hilbert' % Tipo de extracao da envoltoria
+        tipo_env = 'Hilbert' % Tipo de extracao da envoltoria: 'Hilbert' e 'Retificacao'
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
         taxa_est = 1000 % Taxa de estimulacao do gerador de pulsos
@@ -13,7 +13,7 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         fase_pulso = 'Catodico' % Fase inicial do pulso (meia onda 1): 'Anodico' (+) ou 'Catodico' (-)
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilizacao das informacoes do 'paciente padrao' da clase
-        baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstitui��o
+        baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstituicao
         
         tipo_pulso = 'Bifasico' % Formato de pulso eletrico
         max_corr = 1.75e-3 % Maxima corrente do gerador
