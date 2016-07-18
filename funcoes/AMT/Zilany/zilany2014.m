@@ -139,7 +139,8 @@ nrep = 1;
 
 % reptime is the time between stimulus repetitions in seconds; -> set 
 % twice the duration of stim
-reptime = (2*length(stim))/kv.fsmod;
+% reptime = (2*length(stim))/kv.fsmod; % Default
+reptime = length(stim)/kv.fsmod; % set once the duration of stim
 
 % species is either "cat" (1) or "human" (2): "1" for cat and "2" for human
 species = flags.do_human+1;

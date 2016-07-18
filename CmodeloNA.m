@@ -12,7 +12,7 @@ classdef CmodeloNA < Cprocessador
         N_neurons = 50; % Numero total de neuronios
         R_mem = [1900e6 2000e6]; % Resistencia do neuronio [Ohms] | Distribuicao normal entre 1900MOhm e 2000MOhm como 99.7% do intervalo de confianca
         C_mem = [0.07e-12 0.5e-12]; % Capacitancia [F] | Distribuicao normal entre 0.07pF e 0.5pF como 99.7% do intervalo de confianca
-        dt_refrat_abs = [1e-6 330e-6]; % Periodo refratario absoluto [s] | Distribuicao normal entre 1us e 300us
+        dt_refrat_abs = [300e-6 700e-6]; % Periodo refratario absoluto [s] | Distribuicao normal entre 1us e 300us
         V_thr_mem = [-50e-3 -36e-3]; % Potencial limiar [V] | Distribuicao normal entre -50mV e -36mV
         V_rest_mem = [-80e-3 -55e-3]; % Potencial de membrana estacionario [V] | Distribuicao normal entre -80mV e -55mV
         V_ruido_mem = [-2e-3 2e-3];  % Potencial de ruido [V] | Distribuicao normal entre -2mV e 2mV

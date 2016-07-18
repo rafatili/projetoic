@@ -1,6 +1,6 @@
 function [dist_corr,spike_matrix, V_mem, Ap, pos_eletrodo] = LIF(PulsosCorr,num_canais,...
-    freq_amost_pulsos,tipo_esp_corr,lambda,dtn_A,N_neurons,R_mem, C_mem,dt_refrat_abs,...
-    Vthr_mem, V_rest_mem,V_ruido_mem, pos_inicial, dx_eletrodo, Z_eletrodo)
+    freq_amost_pulsos, tipo_esp_corr, lambda, dtn_A, N_neurons, R_mem, C_mem,dt_refrat_abs,...
+    Vthr_mem, V_rest_mem,V_ruido_mem, pos_inicial, dx_eletrodo, Z_eletrodo, fase_pulso)
 
 %% Propriedades
 
@@ -33,9 +33,18 @@ x_coclea = 0:dx_coclea:comp_coclea-dx_coclea; % vetor de posição dos neurônios [
 
 %% Distribuicao da corrente
 
+if strcmp(fase_pulso,'Catodico')==1
+    PulsosCorr = -PulsosCorr;
+end
+
 for i = 1:size(PulsosCorr,1)
     for j = 1:size(PulsosCorr,2)
-        
+        if PulsosCorr(i,j) < 0
+            PulsosCorr(i,j) = 0;
+        end
+%         if PulsosCorr(i,j) > 0
+%             PulsosCorr(i,j) = 0;
+%         end
     end 
 end
 
@@ -71,35 +80,60 @@ for i = 1:size(dist_corr,2)
     end
 end
 spike_matrix = zeros(size(dist_corr)); % matriz de spikes
-an = zeros(size(dist_corr,1));
-RZ = mean(Z_eletrodo);
+% an = zeros(size(dist_corr,1));
+% RZ = mean(Z_eletrodo);
 dt = 1/freq_amost_pulsos;
-tic
-for i = 2:size(dist_corr,2)
-    for j = 1:size(dist_corr,1)
-            if an(j)==0                
-                tau = R(j)*C(j);            
-                V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
-                if V_mem(j,i) >= V_thr(j)
-                    spike_matrix(j,i) = 1;
-                    an(j) = 1;
-                    V_mem(j,i) = V_rest(j,i);
-                end
-                
-            else
-                if dt_refrat(j,i)<an(j)*dt
-                tau = R(j)*C(j);
-                V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
-                    if V_mem(j,i) >= V_thr(j)
-                        spike_matrix(j,i) = 1;
-                        an(j) = 1;
-                        V_mem(j,i) = V_rest(j,i);
-                    end 
-                else
-                    an(j) = an(j) + 1;
-                end
-            end
 
+% tic
+% for i = 2:size(dist_corr,2)
+%     for j = 1:size(dist_corr,1)
+%             if an(j)==0                
+%                 tau = R(j)*C(j);            
+%                 V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
+%                 if V_mem(j,i) >= V_thr(j)
+%                     spike_matrix(j,i) = 1;
+%                     an(j) = 1;
+%                     V_mem(j,i) = V_rest(j,i);
+%                 end
+%                 
+%             else
+%                 if dt_refrat(j,i)<an(j)*dt
+%                 tau = R(j)*C(j);
+%                 V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
+%                     if V_mem(j,i) >= V_thr(j)
+%                         spike_matrix(j,i) = 1;
+%                         an(j) = 1;
+%                         V_mem(j,i) = V_rest(j,i);
+%                     end 
+%                 else
+%                     an(j) = an(j) + 1;
+%                 end
+%             end
+% 
+%     end
+% end
+% toc
+
+tic
+t = 0:dt:size(dist_corr,2)*dt-dt;
+n_refrat = floor(dt_refrat/dt);
+V_thRi = -40e-3; % Threshold potential
+
+V_thR(j,:) = V_thRi.*ones(size(dist_corr)); % Membrane threshold over time
+V_refrat = 0.97.*exp(-(t-0.7e-3)/(1.32e-3)); % Relative refractory period
+dist_corr = -dist_corr*1e-6;
+
+for j = 1:size(dist_corr,1)
+    for i = 2:size(dist_corr,2)-1                                     
+        V_mem(j,i) = V_mem(j,i-1) + (dt/(R(j)*C(j)))*(-(V_mem(j,i-1) - V_rest(j,i)) - R(j)*dist_corr(j,i)) + V_ruido(j,i); 
+        if V_mem(j,i) >= V_thR(j,i)
+        spike_matrix(j,i) = 1;
+            if (i+n_refrat(j,i))<size(dist_corr,1)
+                V_thR(j,i:(i+n_refrat(j,i))) = Inf;
+            end
+        V_thR(j,(i+n_refrat(j,i)+1):size(dist_corr,1)) = V_thRi - V_thRi*V_refrat(1:(size(dist_corr,1)-(i+n_refrat(j,i)+1)+1));
+        V_mem(j,i) = V_rest(j,i);
+        end                                      
     end
 end
 toc
