@@ -14,6 +14,8 @@ classdef CsimIC < CmodeloNA
         tipo_spike_matrix = 'LIF'; % Tipo de matriz de disparos: 'LIF' (Modelo eletrico), 'Zilany'(Modelo acustico)
         SRMR_NH % Valor da metrica SRMR-NH
         SRMR_IC % Valor da metrica SRMR-CI
+        SRMR_clean_NH % Valor da metrica SRMR-NH para o sinal limpo
+        SRMR_clean_IC % Valor da metrica SRMR-CI para o sinal limpo
         Intel_SRMR_NH % Previsao da inteligibilidade para a metrica SRMR-NH
         Intel_SRMR_IC % Previsao da inteligibilidade para a metrica SRMR-CI
     end
@@ -38,7 +40,7 @@ classdef CsimIC < CmodeloNA
                 obj.carrier, obj.baixa_freq, obj.vet_tempo,...
                 obj.F0_HC,obj.df_HC,obj.numhar_HC);
                     if flag == 1
-                        obj.nome_sinal_reconst = obj.arqX;
+                        obj.nome_sinal_reconst = obj.arqX(1:(size(obj.arqX,2)-4));
                         nv = strcat('_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
@@ -47,7 +49,7 @@ classdef CsimIC < CmodeloNA
                     obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
                     obj.baixa_freq, obj.F0_HC, obj.df_HC, obj.numhar_HC);
                     if flag == 1
-                        obj.nome_sinal_reconst = obj.arqX;
+                        obj.nome_sinal_reconst = obj.arqX(1:(size(obj.arqX,2)-4));
                         nv = strcat('_Neural_Vocoder_',obj.carrier,'.wav');
                         audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
                     end
@@ -62,23 +64,18 @@ classdef CsimIC < CmodeloNA
                 case 'LIF'
                     [y,x] = find(obj.spike_matrix);
                     x = x/(2*obj.freq_amost_pulsos);
-                    figure()
-                    plot(x,y,'.k','MarkerSize',2)
-                    ylim([0 max(y)])
-                    xlabel('Tempo(s)')
-                    ylabel('Neuronio "n" (da base (0) ao apice (N))')
-                    set(gca,'Ydir','reverse')
                 
                 case 'Zilany'
                     [y,x] = find(obj.spike_matrix_Zilany);
                     x = x/(1e5);
-                    figure()
-                    plot(x,y,'.k','MarkerSize',2)
-                    ylim([0 max(y)])
-                    xlabel('Tempo(s)')
-                    ylabel('Neuronio "n" (da base (0) ao apice (N))')
-                    %set(gca,'Ydir','reverse')
             end
+            
+            figure()
+            plot(x,y,'.k','MarkerSize',2)
+            %ylim([0 max(y)])
+            xlabel('Tempo(s)')
+            ylabel('Neuronio "n" (da base (0) ao apice (N))')
+            set(gca,'Ydir','reverse')          
         end
         
         function plotEletrodograma(obj) % Plota o eletrodograma com a serie de pulsos
@@ -181,8 +178,12 @@ classdef CsimIC < CmodeloNA
         end
         
         function calcSRMR(obj) % Calcula os valores de SRMR-NH e SRMR-CI
-                obj.SRMR_NH = SRMR(obj.audio_reconst,obj.freq_amost);
-                obj.SRMR_IC = SRMR_CI(obj.audio_reconst,obj.freq_amost);
+                obj.SRMR_NH = SRMR(obj.audio_reconst, obj.freq_amost);
+                obj.SRMR_IC = SRMR_CI(obj.Csinal_processador.in, obj.freq_amost);
+                obj.SRMR_clean_NH = SRMR(obj.Csinal_processador.in, obj.freq_amost);
+                obj.SRMR_clean_IC = SRMR_CI(obj.Csinal_processador.in, obj.freq_amost);
+                obj.Intel_SRMR_NH  = srmr2intel(obj.SRMR_NH, obj.SRMR_clean_NH, 0);
+                obj.Intel_SRMR_IC  = srmr2intel(obj.SRMR_IC, obj.SRMR_clean_IC, 1);                
         end
         
         

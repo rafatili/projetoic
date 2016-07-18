@@ -17,8 +17,9 @@ sim.cis_ace();
 
 % resposta do nervo auditivo
 sim.N_neurons = 100;
-sim.dn_freq_amost = 10;
 sim.calcOndas();
+%%
+sim.dn_freq_amost = 7;
 sim.tipo_esp_corr = 'Exp';
 sim.dtn_A = 10e-3;
 sim.LIF();

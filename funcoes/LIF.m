@@ -42,6 +42,9 @@ for i = 1:size(PulsosCorr,1)
         if PulsosCorr(i,j) < 0
             PulsosCorr(i,j) = 0;
         end
+%         if PulsosCorr(i,j) > 0
+%             PulsosCorr(i,j) = 0;
+%         end
     end 
 end
 
@@ -77,35 +80,62 @@ for i = 1:size(dist_corr,2)
     end
 end
 spike_matrix = zeros(size(dist_corr)); % matriz de spikes
-an = zeros(size(dist_corr,1));
-RZ = mean(Z_eletrodo);
+% an = zeros(size(dist_corr,1));
+% RZ = mean(Z_eletrodo);
 dt = 1/freq_amost_pulsos;
-tic
-for i = 2:size(dist_corr,2)
-    for j = 1:size(dist_corr,1)
-            if an(j)==0                
-                tau = R(j)*C(j);            
-                V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
-                if V_mem(j,i) >= V_thr(j)
-                    spike_matrix(j,i) = 1;
-                    an(j) = 1;
-                    V_mem(j,i) = V_rest(j,i);
-                end
-                
-            else
-                if dt_refrat(j,i)<an(j)*dt
-                tau = R(j)*C(j);
-                V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
-                    if V_mem(j,i) >= V_thr(j)
-                        spike_matrix(j,i) = 1;
-                        an(j) = 1;
-                        V_mem(j,i) = V_rest(j,i);
-                    end 
-                else
-                    an(j) = an(j) + 1;
-                end
-            end
 
+% tic
+% for i = 2:size(dist_corr,2)
+%     for j = 1:size(dist_corr,1)
+%             if an(j)==0                
+%                 tau = R(j)*C(j);            
+%                 V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
+%                 if V_mem(j,i) >= V_thr(j)
+%                     spike_matrix(j,i) = 1;
+%                     an(j) = 1;
+%                     V_mem(j,i) = V_rest(j,i);
+%                 end
+%                 
+%             else
+%                 if dt_refrat(j,i)<an(j)*dt
+%                 tau = R(j)*C(j);
+%                 V_mem(j,i) = V_mem(j,i-1) + (dt/tau)*(-(V_mem(j,i-1) - V_rest(j,i)) + RZ*dist_corr(j,i)) + V_ruido(j,i);                       
+%                     if V_mem(j,i) >= V_thr(j)
+%                         spike_matrix(j,i) = 1;
+%                         an(j) = 1;
+%                         V_mem(j,i) = V_rest(j,i);
+%                     end 
+%                 else
+%                     an(j) = an(j) + 1;
+%                 end
+%             end
+% 
+%     end
+% end
+% toc
+
+tic
+t = 0:dt:size(dist_corr,2)*dt-dt;
+n_refrat = floor(dt_refrat/dt);
+%V_thRi = -40e-3; % Threshold potential
+V_thR = zeros(size(dist_corr));
+for j = 1:size(dist_corr,2)
+    V_thR(:,j) = V_thr;
+end
+V_refrat = 0.97.*exp(-(t-0.7e-3)/(1.32e-3)); % Relative refractory period
+dist_corr = -dist_corr*2e-7;
+
+for j = 1:size(dist_corr,1)
+    for i = 2:size(dist_corr,2)-1                                     
+        V_mem(j,i) = V_mem(j,i-1) + (dt/(R(j)*C(j)))*(-(V_mem(j,i-1) - V_rest(j,i)) - R(j)*dist_corr(j,i)) + V_ruido(j,i); 
+        if V_mem(j,i) >= V_thR(j,i)
+        spike_matrix(j,i) = 1;
+            if (i+n_refrat(j,i))<size(dist_corr,2)
+                V_thR(j,i:(i+n_refrat(j,i))) = Inf;
+            end
+        V_thR(j,(i+n_refrat(j,i)+1):size(dist_corr,1)) = V_thr(j) - V_thr(j)*V_refrat(1:(size(dist_corr,1)-(i+n_refrat(j,i)+1)+1));
+        V_mem(j,i) = V_rest(j,i);
+        end                                      
     end
 end
 toc
@@ -117,9 +147,9 @@ size(spike_matrix)
 W = 1:N_neurons_pop;
 Wn = pdf('norm',W,mean(W),1);
 Wn = Wn/max(Wn);
-n_A = ceil(dtn_A*freq_amost_pulsos);
-N_A = ceil(size(spike_matrix,2)/n_A);
-
+n_A = floor(dtn_A*freq_amost_pulsos);
+N_A = floor(size(spike_matrix,2)/n_A);
+Ap = zeros(num_canais,N_A);
 tic
 for i1 = 1:num_canais
     for i2 = 1:N_A-1
