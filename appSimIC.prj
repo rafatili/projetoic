@@ -1,0 +1,119 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration file="C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master\appSimIC.prj" location="C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master" name="appSimIC" target="target.mlapps" target-name="Package App">
+    <param.appname>appSimIC</param.appname>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms>
+      <item>win64</item>
+    </param.platforms>
+    <param.output>C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master</param.output>
+    <param.guid>64633620-9340-4e99-b50a-58b74c06dbc1</param.guid>
+    <unset>
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\appSimIC.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\circle.m</file>
+      <file>${PROJECT_ROOT}\CmodeloNA.m</file>
+      <file>${PROJECT_ROOT}\Cpaciente.m</file>
+      <file>${PROJECT_ROOT}\Cprocessador.m</file>
+      <file>${PROJECT_ROOT}\CsimIC.m</file>
+      <file>${PROJECT_ROOT}\CsinalEntrada.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\assert_sigreshape_post.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\assert_sigreshape_pre.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\audspace.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\audtofreq.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\dbspl.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\freqtoaud.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\gaindb.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\ltfatarghelper.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\rms.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\setdbspl.m</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\Zilany\comp_zilany2014_model_IHC.mexw64</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\Zilany\comp_zilany2014_model_Synapse.mexw64</file>
+      <file>${PROJECT_ROOT}\funcoes\AMT\Zilany\zilany2014.m</file>
+      <file>${PROJECT_ROOT}\funcoes\calcOndas.m</file>
+      <file>${PROJECT_ROOT}\funcoes\comp.m</file>
+      <file>${PROJECT_ROOT}\funcoes\ext_env.m</file>
+      <file>${PROJECT_ROOT}\funcoes\ger_pulsos.m</file>
+      <file>${PROJECT_ROOT}\funcoes\LIF.m</file>
+      <file>${PROJECT_ROOT}\funcoes\loadHRIR1.m</file>
+      <file>${PROJECT_ROOT}\funcoes\media_paciente_cochlear.m</file>
+      <file>${PROJECT_ROOT}\funcoes\neural_vocoder.m</file>
+      <file>${PROJECT_ROOT}\funcoes\s_and_n.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\auditory\ERBFilterBank.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\auditory\ERBSpace.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\auditory\MakeERBFilters.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\calc_cutoffs.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\calcERBs.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\CIFilterBank.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\cochlearFilterBank.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\computeModulationCFs.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\gammatonegram\fft2gammatonemx.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\gammatonegram\gammatonegram.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\MakeCIFilters.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\makeModulationFilter.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\modulationFilterBank.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\PreProc\asl_adjust.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\PreProc\asl_adjust_wrapper.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\PreProc\asl_meter.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\preprocess.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\vad\vad_s.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\libs\vad\vad_s_wrapper.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\SRMR.m</file>
+      <file>${PROJECT_ROOT}\funcoes\SRMRToolbox-master\SRMR_CI.m</file>
+      <file>${PROJECT_ROOT}\funcoes\suplabel.m</file>
+      <file>${PROJECT_ROOT}\funcoes\vocoder.m</file>
+      <file>${PROJECT_ROOT}\playIcon.jpg</file>
+    </fileset.depfun>
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="C:\Users\MURTA\Dropbox\Coclear\GUI_IC" name="projetoic-master" optional="false">C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2016a</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.2</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
