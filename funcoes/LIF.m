@@ -51,7 +51,7 @@ end
 dist_corr = zeros(length(x_coclea),size(PulsosCorr,2));
 
 switch(tipo_esp_corr)
-    case 'Exp'
+    case 0 % Exponencial
     for i = 1:size(PulsosCorr,2)
         for j = 1:size(PulsosCorr,1)
             if PulsosCorr(j,i)>0       
@@ -59,7 +59,7 @@ switch(tipo_esp_corr)
             end
         end
     end
-    case 'Gauss'
+    case 1 % Gaussiano
     for i = 1:size(PulsosCorr,2)
         for j = 1:size(PulsosCorr,1)
             if PulsosCorr(j,i)>0 
@@ -69,6 +69,8 @@ switch(tipo_esp_corr)
             end
         end 
     end
+    otherwise 
+        error('Somente as seguintes opcoes: 0 - Exponencial / 1 - Gaussiano');
 end
 
 %% Leaky Integrate and Fire

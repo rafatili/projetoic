@@ -10,7 +10,7 @@ function [onda , pulso_amp] = calcOndas( pulsos, freq2, tipo, largura1, largura2
 %   tempo: vetor de tempo
 
 switch(tipo)
-    case 'Bifasico'
+    case 0
         %% para pulsos bifasicos
         L1 = floor(largura1*freq2);
         L2 = floor(largura2*freq2);

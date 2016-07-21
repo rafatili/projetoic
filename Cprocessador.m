@@ -4,18 +4,18 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
     
     properties 
         Csinal_processador % Classe com sinais de cada bloco de processamento
-        tipo_filtro = 'ERB' % Tipo de filtro para o banco do IC: 'ERB' ; 'Nucleus';
-        tipo_env = 'Hilbert' % Tipo de extracao da envoltoria: 'Hilbert' e 'Retificacao'
+        tipo_filtro = 0 % Tipo de filtro para o banco do IC: 0 - ERB / 1 - Nucleus
+        tipo_env = 0 % Tipo de extracao da envoltoria: 0 - Hilbert / 1 - Retificacao
         fcorte_fpb = 400; % Frequencia de corte do FPB apos retificacao
         ordem_fpb = 4; % Ordem do FPB apos retificacao
         taxa_est = 1000 % Taxa de estimulacao do gerador de pulsos
         quant_bits = 8 % Numero de bits para divisao da faixa dinamica
-        fase_pulso = 'Catodico' % Fase inicial do pulso (meia onda 1): 'Anodico' (+) ou 'Catodico' (-)
+        fase_pulso = 0 % Fase inicial do pulso (meia onda 1): 0 - Catodico(-) / 1 - Anodico 
         atraso = 0; % Atraso do envelope entre canais: 0 (sem atraso) ou 1 (com atraso)
         paciente = 'padrao' % Utilizacao das informacoes do 'paciente padrao' da clase
         baixa_freq = 150 % Frequencia central do primeiro filtro do banco de reconstituicao
         
-        tipo_pulso = 'Bifasico' % Formato de pulso eletrico
+        tipo_pulso = 0 % Formato de pulso eletrico: 0 - Bifasico
         max_corr = 1.75e-3 % Maxima corrente do gerador
         ERB_bandas % Largura das bandas filtro Gammatone ERB
         ERB_cf % Frequencias centrais filtro Gammatone ERB
@@ -77,11 +77,11 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
         function filtros(obj) % Banco de filtros do IC
             switch(obj.tipo_filtro)
                 
-                case 'ERB'
+                case 0 % Equivalent Rectangular Bandwidth (ERB)
                 [obj.Csinal_processador.filt, obj.ERB_bandas, obj.ERB_cf] = cochlearFilterBank(...
                     obj.freq_amost, obj.num_canais, obj.baixa_freq, obj.Csinal_processador.in);
                 
-                case 'Nucleus'
+                case 1 % Nucleus (Cochlear)
                     if obj.num_canais ~= 22
                         error('O banco de filtros do Nucleus Freedom funciona apenas para 22 canais!')
                     else
@@ -89,6 +89,8 @@ classdef Cprocessador < Cpaciente & CsinalEntrada
                         obj.freq_amost, obj.num_canais,obj.central_freq(1),...
                         obj.Csinal_processador.in);
                     end
+                 otherwise
+                    error('Somente as seguintes opcoes: 0 - ERB / 1 - Nucleus');
             end
         end 
     

@@ -5,27 +5,30 @@ function saida = vocoder(entrada,freq_amost,carrier,baixa_freq,vet_tempo,F0_HC,d
     
     switch(carrier)
        
-        case 'Ruido'
+        case 0 % Ruido
         Ruido = randn(size(entrada,2),1);  % Gera ruido branco
         Ruido = Ruido - median(Ruido); % Media = 0
         Ruido = Ruido/max(abs(Ruido)); % Normaliza entre -1 e 1          
         
         Bandas = cochlearFilterBank(freq_amost, size(entrada,1), f1 , Ruido); % Filtros Gammatone
        
-        case 'Senoidal' 
+        case 1 % Senoidal 
         Bandas = zeros(size(entrada,1),length(vet_tempo));
         [~,~, cf] = cochlearFilterBank(freq_amost, size(entrada,1), f1 , entrada(1,:));
         for i = 1:size(entrada,1)
            Bandas(i,:) = sin(2*pi*cf(i).*vet_tempo)';
         end
         
-        case 'HC'        
+        case 2 % HC        
         fh = F0_HC:df_HC:numhar_HC*df_HC;
         SOMA = 0;
         for i = 1:length(fh)
            SOMA = SOMA + sin(2*pi*fh(i).*vet_tempo + 2*pi*rand(1));
         end        
         Bandas = cochlearFilterBank(freq_amost, size(entrada,1), f1, SOMA);
+        
+        otherwise
+            error('Somente as seguintes opcoes: 0 - Ruido / 1 - Senoidal / 2 - HC');
    
     end
         
