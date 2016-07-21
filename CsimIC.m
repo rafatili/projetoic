@@ -5,13 +5,13 @@ classdef CsimIC < CmodeloNA
     properties
         nome_sinal_reconst % Nome do arquivo gerado para o sinal reconstruido
         audio_reconst % Sinal de audio reconstruido
-        carrier = 'Senoidal'; % Carrier (sinal portador) do vocoder: 'Ruido', 'Senoidal' e 'HC'
+        carrier = 1; % Carrier (sinal portador) do vocoder: 0 - Ruido / 1 - Senoidal / 2 - HC
         numhar_HC = 240; % Numero de harmonicos no complexo
         df_HC = 100; % Discretizacao do complexo harmonico
         F0_HC = 100; % Frequencia fundamental do complexo harmonico
-        tipo_vocoder = 'Neural'; % 'Normal' ou 'Neural'
-        tipo_espec = 'Wavelet'; % Tipo de espectograma: 'Wavelet', 'FFT'
-        tipo_spike_matrix = 'LIF'; % Tipo de matriz de disparos: 'LIF' (Modelo eletrico), 'Zilany'(Modelo acustico)
+        tipo_vocoder = 1; % 0 - Tradicional / 1 - Neural
+        tipo_espec = 0; % Tipo de espectograma: 0 - Wavelet / - FFT
+        tipo_spike_matrix = 0; % Tipo de matriz de disparos: 0 - LIF (Modelo eletrico) / 1 - Zilany (Modelo acustico)
         SRMR_NH % Valor da metrica SRMR-NH
         SRMR_IC % Valor da metrica SRMR-CI
         SRMR_clean_NH % Valor da metrica SRMR-NH para o sinal limpo
@@ -27,7 +27,7 @@ classdef CsimIC < CmodeloNA
             obj@CmodeloNA(arquivo_dat,varargin{:});
         end
        
-        function vocoder(obj,flag) % Reconstrucao atraves do vocoder: 'Normal' ou 'Neural'
+        function vocoder(obj,flag) % Reconstrucao atraves do vocoder: Tradicional ou Neural
             if (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 > obj.freq_amost
                 display('A condicao (max(obj.ERB_cf) + max(obj.ERB_bandas)/2)*2 <= obj.freq_amost deve ser seguida');
                 error('Frequencia de amostragem baixa para os filtros de alta frequencia!!!');             
@@ -35,24 +35,26 @@ classdef CsimIC < CmodeloNA
                 
             switch(obj.tipo_vocoder)
                 
-                case 'Normal'
-                obj.audio_reconst = vocoder(obj.Csinal_processador.env,obj.freq_amost,...
+                case 0 % Tradicional
+                obj.audio_reconst.Tradicional = vocoder(obj.Csinal_processador.env,obj.freq_amost,...
                 obj.carrier, obj.baixa_freq, obj.vet_tempo,...
                 obj.F0_HC,obj.df_HC,obj.numhar_HC);
                     if flag == 1
                         obj.nome_sinal_reconst = obj.arqX(1:(size(obj.arqX,2)-4));
                         nv = strcat('_Vocoder_',obj.carrier,'.wav');
-                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
+                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst.Tradicional,obj.freq_amost);
                     end
                     
-                case 'Neural'
-                    obj.audio_reconst = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
+                case 1 % Neural
+                    obj.audio_reconst.Neural = neural_vocoder(obj.Ap,obj.freq_amost,obj.carrier,obj.dtn_A,obj.pos_eletrodo,...
                     obj.baixa_freq, obj.F0_HC, obj.df_HC, obj.numhar_HC);
                     if flag == 1
                         obj.nome_sinal_reconst = obj.arqX(1:(size(obj.arqX,2)-4));
                         nv = strcat('_Neural_Vocoder_',obj.carrier,'.wav');
-                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst,obj.freq_amost)
+                        audiowrite(char(strcat(obj.nome_sinal_reconst,nv)),obj.audio_reconst.Neural,obj.freq_amost);
                     end
+                otherwise
+                    error('Somente as seguintes opcoes: 0 - Tradicional / 1 - Neural');
             end
             
             end
@@ -61,13 +63,15 @@ classdef CsimIC < CmodeloNA
         
         function plotSpikes(obj) % Plota a matriz de disparos obtida com o modelo do NA
             switch(obj.tipo_spike_matrix)
-                case 'LIF'
+                case 0 % LIF
                     [y,x] = find(obj.spike_matrix);
                     x = x/(2*obj.freq_amost_pulsos);
                 
-                case 'Zilany'
+                case 1 % Zilany
                     [y,x] = find(obj.spike_matrix_Zilany);
                     x = x/(1e5);
+                otherwise
+                    error('Somente as seguintes opcoes: 0 - LIF / 1 - Zilany');
             end
             
             figure()
@@ -105,7 +109,7 @@ classdef CsimIC < CmodeloNA
         
         function plotEspectrograma(obj) % Plota o espectrograma do sinal de entrada
             switch obj.tipo_espec               
-                case 'Wavelet'
+                case 0 % Wavelet
                     figure()
                     level = 6;
                     wpt = wpdec(obj.Csinal_processador.in,level,'sym8');
@@ -119,7 +123,7 @@ classdef CsimIC < CmodeloNA
                     ylabel('f(Hz)');
                     xlabel('t(s)'); 
                     
-                case 'FFT'                    
+                case 1 % FFT                    
                     figure();        
                     [p,f,t] = spectrogram(obj.Csinal_processador.in,256,120,256,obj.freq_amost,'yaxis');
                     surf(t,f,10*log10(abs(p)),'EdgeColor','none');
@@ -131,7 +135,9 @@ classdef CsimIC < CmodeloNA
                     colormap(jet);
                     view(0,90);
                     ylabel('f(Hz)');
-                    xlabel('t(s)');                 
+                    xlabel('t(s)');
+                otherwise
+                    error('Somente as seguintes opcoes: 0 - Wavelet / 1 - FFT');
             end
         end
         
@@ -152,7 +158,7 @@ classdef CsimIC < CmodeloNA
         
         function plotFiltros(obj) % Plota o banco de filtros utilizado
              switch obj.tipo_filtro
-                 case 'ERB'
+                 case 0 % ERB
                     np = 2048;
                     y = cochlearFilterBank(obj.freq_amost, obj.num_canais,obj.central_freq(1), [1 zeros(1,(np-1))]);
                     resp = 20*log10(abs(fft(y')));
@@ -163,7 +169,7 @@ classdef CsimIC < CmodeloNA
                     xlabel('Frequencia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10); 
                  
-                 case 'Nucleus'
+                 case 1 % Nucleus
                     np = 2048;
                     y = CIFilterBank(obj.freq_amost, obj.num_canais,obj.central_freq(1), [1 zeros(1,(np-1))]);
                     resp = 20*log10(abs(fft(y')));
@@ -173,6 +179,8 @@ classdef CsimIC < CmodeloNA
                     axis([1e2 0.8e4 -80 0])
                     xlabel('Frequencia (Hz)','FontSize',10);
                     ylabel('Resposta (dB)','FontSize',10);
+                 otherwise
+                    error('Somente as seguintes opcoes: 0 - ERB / 1 - Nucleus');
              end
                     
         end

@@ -16,10 +16,10 @@ sim.taxa_est = 800;
 sim.cis_ace();
 
 % resposta do nervo auditivo
-sim.N_neurons = 100;
-sim.dn_freq_amost = 10;
+sim.N_neurons = 50;
+sim.dn_freq_amost = 3;
 sim.calcOndas();
-sim.tipo_esp_corr = 'Exp';
+sim.tipo_esp_corr = 0; % Exponencial
 sim.dtn_A = 10e-3;
 sim.LIF();
 
@@ -29,6 +29,6 @@ sim.plotSpikes();
 sim.plotNeurograma();
 %%
 % vocoder
-sim.carrier = 'Senoidal';
-sim.tipo_vocoder = 'Neural';
-sim.vocoder(1);
+sim.carrier = 1; % Senoidal;
+sim.tipo_vocoder = 1; % Neural;
+sim.vocoder(0); % 

@@ -38,16 +38,7 @@ function audio = neural_vocoder(Ap,freq_amost,carrier,dtn_A,pos_eletrodo,baixa_f
      senos = zeros(size(audio));
      
 switch(carrier)     
-    case 'Senoidal'
-            [~,~, cf] = cochlearFilterBank(freq_amost, size(audio,1), f1 , audio(1,:));
-            for i = 1:size(audio,1)  
-                senos(i,:) = sin(2*pi*cf(i).*t_reconst);
-                SOMA = SOMA + senos(i,:).*audio(i,:);
-            end          
-                audio = 0.25*SOMA/max(SOMA);
-                
-                
-    case 'Ruido'
+    case 0 % Ruido
             Ruido = randn(size(audio,2),1);  % gera ruido branco
             Ruido = Ruido - median(Ruido); % força que a media seja = 0
             Ruido = Ruido/max(abs(Ruido)); % normaliza entre -1 e 1                  
@@ -60,9 +51,18 @@ switch(carrier)
             end
 
             OutMax = max(Audio_out);     % igual ao do sinal de entrada.
-            audio = 0.25*Audio_out/max(OutMax);  
-            
-    case 'HC'
+            audio = 0.25*Audio_out/max(OutMax); 
+    
+    
+    case 1 % Senoidal
+            [~,~, cf] = cochlearFilterBank(freq_amost, size(audio,1), f1 , audio(1,:));
+            for i = 1:size(audio,1)  
+                senos(i,:) = sin(2*pi*cf(i).*t_reconst);
+                SOMA = SOMA + senos(i,:).*audio(i,:);
+            end          
+                audio = 0.25*SOMA/max(SOMA);                              
+          
+    case 2 % HC
        
             fh = F0_HC:df_HC:numhar_HC*df_HC;
             SOMA = 0;
@@ -79,7 +79,9 @@ switch(carrier)
             end
 
             OutMax = max(Audio_out);     % igual ao do sinal de entrada.
-            audio = 0.25*Audio_out/max(OutMax); 
+            audio = 0.25*Audio_out/max(OutMax);
+    otherwise
+        error('Somente as seguintes opcoes: 0 - Ruido / 1 - Senoidal / 2 - HC');
 end
             
 

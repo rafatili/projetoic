@@ -16,7 +16,7 @@ classdef CmodeloNA < Cprocessador
         V_thr_mem = [-50e-3 -36e-3]; % Potencial limiar [V] | Distribuicao normal entre -50mV e -36mV
         V_rest_mem = [-80e-3 -55e-3]; % Potencial de membrana estacionario [V] | Distribuicao normal entre -80mV e -55mV
         V_ruido_mem = [-2e-3 2e-3];  % Potencial de ruido [V] | Distribuicao normal entre -2mV e 2mV
-        tipo_esp_corr = 'Gauss'; % Modelo de espalhamento de corrente: 'Exp' ou 'Gauss'
+        tipo_esp_corr = 1; % Modelo de espalhamento de corrente: 0 - Exponencial / 1 - Gaussiano
         pos_inicial = 0; % Posicao inicial do arrranjo de eletrodos inserido na coclea [mm]
         pos_eletrodo = fliplr(1:22); % Vetor de posicao de cada eletrodo no arranjo
         dx_eletrodo = 1; % Distancia entre eletrodos [mm]
