@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration file="C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master\appSimIC.prj" location="C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master" name="appSimIC" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2649270693" file="C:\Users\MURTA\Dropbox\Github\projetoic\appSimIC.prj" location="C:\Users\MURTA\Dropbox\Github\projetoic" name="appSimIC" target="target.mlapps" target-name="Package App">
     <param.appname>appSimIC</param.appname>
     <param.authnamewatermark />
     <param.email />
@@ -13,10 +13,8 @@
     <param.products.name />
     <param.products.id />
     <param.products.version />
-    <param.platforms>
-      <item>win64</item>
-    </param.platforms>
-    <param.output>C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master</param.output>
+    <param.platforms />
+    <param.output>C:\Users\MURTA\Dropbox\Github\projetoic</param.output>
     <param.guid>64633620-9340-4e99-b50a-58b74c06dbc1</param.guid>
     <unset>
       <param.authnamewatermark />
@@ -31,13 +29,13 @@
       <param.products.name />
       <param.products.id />
       <param.products.version />
+      <param.platforms />
       <param.output />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}\appSimIC.mlapp</file>
     </fileset.main>
     <fileset.depfun>
-      <file>${PROJECT_ROOT}\circle.m</file>
       <file>${PROJECT_ROOT}\CmodeloNA.m</file>
       <file>${PROJECT_ROOT}\Cpaciente.m</file>
       <file>${PROJECT_ROOT}\Cprocessador.m</file>
@@ -93,7 +91,7 @@
     <fileset.resources />
     <fileset.package />
     <build-deliverables>
-      <file location="C:\Users\MURTA\Dropbox\Coclear\GUI_IC" name="projetoic-master" optional="false">C:\Users\MURTA\Dropbox\Coclear\GUI_IC\projetoic-master</file>
+      <file location="C:\Users\MURTA\Dropbox\Github" name="projetoic" optional="false">C:\Users\MURTA\Dropbox\Github\projetoic</file>
     </build-deliverables>
     <workflow />
     <matlab>
